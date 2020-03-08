@@ -1,0 +1,5 @@
+<loop id="1">
+<move x="494" y="207"/>
+<mousePress id="left"/>
+<mouseRelease id="left"/>
+</loop>

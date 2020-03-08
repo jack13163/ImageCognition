@@ -1,0 +1,16 @@
+<loop id="100">
+<move x="494" y="432"/>
+<mousePress id="left"/>
+<mouseRelease id="left"/>
+<delay time="10"/>
+<move x="582" y="434"/>
+<mousePress id="left"/>
+<mouseRelease id="left"/>
+<delay time="10"/>
+<keyPress value="127"/>
+<keyRelease value="127"/>
+<delay time="10"/>
+<keyPress value="10"/>
+<keyRelease value="10"/>
+<delay time="100"/>
+</loop>
