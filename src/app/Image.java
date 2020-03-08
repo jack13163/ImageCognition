@@ -2,6 +2,7 @@ package app;
 
 import confnition.CoordBean;
 import confnition.ImageCognition;
+import utis.PerceptualHash;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,50 +12,60 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
 public class Image {
     public static void main(String[] args) throws Exception {
-        findImage4FullScreen(ImageCognition.SIM_ACCURATE_VERY);
+        findImage4FullScreen("data/images/20204408134403.png",
+                "data/images/20204408134436.png",
+                ImageCognition.SIM_ACCURATE_VERY);
     }
 
-    public static void findImage4FullScreen(int sim) throws Exception {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int w = (int) screenSize.getWidth();
-        int h = 200;
+    /**
+     * ç²¾ç¡®æ‰¾å›¾
+     * @param src
+     * @param tofind
+     * @param sim
+     * @throws Exception
+     */
+    public static void findImage4FullScreen(String src, String tofind, int sim) throws Exception {
+        // å°†è¦æŸ¥æ‰¾çš„æœ¬åœ°å›¾è¯»åˆ°BufferedImage
+        InputStream srcStream = new FileInputStream(src);
+        BufferedImage screenImg = ImageIO.read(srcStream);
+        InputStream in = new FileInputStream(tofind);
+        BufferedImage searchImg = ImageIO.read(in);
 
-        Robot robot = new Robot();
-        BufferedImage screenImg = robot.createScreenCapture(new Rectangle(0, 0,
-                w, h));
-        OutputStream out = new FileOutputStream("data/images/screen.png");
-        ImageIO.write(screenImg, "png", out);//½«½Øµ½µÄBufferedImageĞ´µ½±¾µØ
-
-        InputStream in = new FileInputStream("data/images/search.jpg");
-        BufferedImage searchImg = ImageIO.read(in);//½«Òª²éÕÒµÄ±¾µØÍ¼¶Áµ½BufferedImage
-
-        //Í¼Æ¬Ê¶±ğ¹¤¾ßÀà
+        //å›¾ç‰‡è¯†åˆ«å·¥å…·ç±»
         ImageCognition ic = new ImageCognition();
 
         List<CoordBean> list = ic.imageSearch(screenImg, searchImg, sim);
         for (CoordBean coordBean : list) {
-            System.out.println("ÕÒµ½Í¼Æ¬,×ø±êÊÇ" + coordBean.getX() + "," + coordBean.getY());
+            System.out.println("æ‰¾åˆ°å›¾ç‰‡,åæ ‡æ˜¯" + coordBean.getX() + "," + coordBean.getY());
 
-            //±ê×¢ÕÒµ½µÄÍ¼µÄÎ»ÖÃ
+            //æ ‡æ³¨æ‰¾åˆ°çš„å›¾çš„ä½ç½®
             Graphics g = screenImg.getGraphics();
             g.setColor(Color.BLACK);
-            g.drawRect(coordBean.getX(), coordBean.getY(),
-                    searchImg.getWidth(), searchImg.getHeight());
+            g.drawRect(coordBean.getX(), coordBean.getY(), searchImg.getWidth(), searchImg.getHeight());
             g.setFont(new Font(null, Font.BOLD, 20));
-            g.drawString("¡ûÕÒµ½µÄÍ¼Æ¬ÔÚÕâÀï", coordBean.getX() + searchImg.getWidth() + 5,
-                    coordBean.getY() + 10 + searchImg.getHeight() / 2);
-            out = new FileOutputStream("data/images/result.png");
+            g.drawString("â†æ‰¾åˆ°çš„å›¾ç‰‡åœ¨è¿™é‡Œ", coordBean.getX() + searchImg.getWidth() + 5, coordBean.getY() + 10 + searchImg.getHeight() / 2);
+            OutputStream out = new FileOutputStream("data/images/result.png");
             ImageIO.write(screenImg, "png", out);
         }
+    }
+
+    /**
+     * æ ¹æ®ç¼©ç•¥å›¾æ‰¾å›¾
+     * @param src
+     * @param tofind
+     * @return
+     */
+    public static boolean findImageByThumbnail(String src, String tofind) throws IOException {
+        BufferedImage image1 = ImageIO.read(new File(src));
+        BufferedImage image2 = ImageIO.read(new File(tofind));
+        boolean code = PerceptualHash.perceptualHashSimilarity(image1,image2);
+        return code;
     }
 }

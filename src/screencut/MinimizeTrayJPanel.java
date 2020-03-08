@@ -51,7 +51,7 @@ public class MinimizeTrayJPanel extends JFrame {
 		// 获取系统托盘
 		st = SystemTray.getSystemTray();
 		// 托盘图标
-		ImageIcon i = new ImageIcon(getClass().getResource("ss.png"));
+		ImageIcon i = new ImageIcon("data/images/ss.png");
 		ti = new TrayIcon(i.getImage(), "Shift+Alt+A截图，Ctrl+Alt+Q退出程序", pm);
 		st.add(ti);
 		ti.addMouseListener(new MouseAdapter() {
