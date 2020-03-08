@@ -89,9 +89,6 @@ public class ImageDigital {
     public static void writeImg(BufferedImage img, String formatName, String destPath) {
         OutputStream out = null;
         try {
-            // int imgType = img.getType();
-            // System.out.println("w:" + img.getWidth() + "  h:" +
-            // img.getHeight());
             out = new FileOutputStream(destPath);
             ImageIO.write(img, formatName, out);
         } catch (IOException e) {
@@ -116,8 +113,7 @@ public class ImageDigital {
      * @param formatName 存储的文件格式
      * @param destPath   图像要保存的存储位置
      */
-    public static void writeImg(int pix[], int w, int h, String formatName,
-                                String destPath) {
+    public static void writeImg(int pix[], int w, int h, String formatName, String destPath) {
         //img = new BufferedImage(w, h,ColorModel.getRGBdefault());
         img.setRGB(0, 0, w, h, pix, 0, w);
         writeImg(img, formatName, destPath);

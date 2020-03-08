@@ -1,15 +1,12 @@
-package autokey;//package autokey;
+package autokey;
 
-import java.awt.MouseInfo;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -23,9 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 
-@SuppressWarnings("serial")
-public class GamePanel extends JPanel implements Runnable, ActionListener,
-        MouseListener, MouseMotionListener {
+public class GamePanel extends JPanel implements Runnable, ActionListener, MouseListener, MouseMotionListener {
     JLabel label1 = new JLabel("X:");
     JTextField jtf1 = new JTextField(5);
     JLabel label2 = new JLabel("Y:");
@@ -33,58 +28,41 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
     JButton btn1 = new JButton("定位");
     JLabel label3 = new JLabel("（按ESC停止）");
     JButton btn2 = new JButton("添加");
+
     Vector<String> vector = new Vector<String>();
     JLabel label6 = new JLabel("点击方式:");
     JComboBox jcb = new JComboBox(vector);
+
     JLabel label5 = new JLabel("延时(ms):");
     JTextField jtf3 = new JTextField("2000", 5);
-    JButton btn5 = new JButton("添加");
+    JButton btnDelay = new JButton("添加");
+
     JLabel label7 = new JLabel("按键方式:");
     Vector<String> vector2 = new Vector<String>();
     JComboBox jcb2 = new JComboBox(vector2);
     JLabel label8 = new JLabel("0~9|A~Z:");
     JTextField jtf4 = new JTextField(10);
     JButton btn6 = new JButton("添加");
-    JTextArea jta = new JTextArea("<loop>\n</loop>");
+
+    JLabel lblInputContent = new JLabel("输入内容:");
+    JTextArea txtInputContent = new JTextArea();
+    JScrollPane jspContent = new JScrollPane(txtInputContent);
+    JButton btnInputContent = new JButton("添加");
+
+    JLabel lblScript = new JLabel("脚本内容:");
+    JTextArea jta = new JTextArea("<loop id=\"1\">\n</loop>");
     JScrollPane jsp = new JScrollPane(jta);
+
     JButton btn7 = new JButton("导入");
     JButton btn8 = new JButton("导出");
-    static JButton btn3 = new JButton("开始");
+    static JButton btnStart = new JButton("开始");
     JLabel label4 = new JLabel("（按ESC停止）");
     static JButton btn4 = new JButton("停止");
+
     public static boolean xystate = false;
 
-    GamePanel() {
+    public GamePanel() {
         super();
-        setLayout(null);
-        this.setBounds((kettest.tk.width - 400) / 2, (kettest.tk.height - 300) / 2, 400, 300);
-        label1.setBounds(10, 10, 15, 25);
-        jtf1.setBounds(30, 10, 40, 25);
-        label2.setBounds(80, 10, 15, 25);
-        jtf2.setBounds(100, 10, 40, 25);
-        btn1.setBounds(150, 10, 60, 25);
-        label3.setBounds(215, 10, 100, 25);
-        btn2.setBounds(300, 10, 60, 25);
-
-        label6.setBounds(10, 40, 60, 25);
-        jcb.setBounds(70, 40, 60, 25);
-        label5.setBounds(150, 40, 60, 25);
-        jtf3.setBounds(210, 40, 80, 25);
-        btn5.setBounds(300, 40, 60, 25);
-
-        label7.setBounds(10, 70, 60, 25);
-        jcb2.setBounds(70, 70, 60, 25);
-        label8.setBounds(150, 70, 60, 25);
-        jtf4.setBounds(210, 70, 80, 25);
-        btn6.setBounds(300, 70, 60, 25);
-
-        jsp.setBounds(10, 100, 350, 225);
-
-        btn7.setBounds(10, 330, 60, 25);
-        btn8.setBounds(80, 330, 60, 25);
-        btn3.setBounds(150, 330, 60, 25);
-        label4.setBounds(215, 330, 100, 25);
-        btn4.setBounds(300, 330, 60, 25);
 
         vector.add("左击");
         vector.add("右击");
@@ -94,51 +72,90 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
         vector2.add("键出");
         vector2.add("键入键出");
 
-        add(label1);
-        add(jtf1);
-        add(label2);
-        add(jtf2);
-        add(btn1);
-        add(label3);
-        add(btn2);
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        add(contentPanel);
 
-        add(label6);
-        add(jcb);
-        add(label5);
-        add(jtf3);
-        add(btn5);
+        JPanel northPanel = new JPanel();
+        JPanel centerPanel = new JPanel();
+        JPanel southPanel = new JPanel();
+        northPanel.setPreferredSize(new Dimension(400,200));
+        centerPanel.setPreferredSize(new Dimension(400,200));
+        southPanel.setPreferredSize(new Dimension(400,100));
+        contentPanel.add(northPanel, BorderLayout.NORTH);
+        contentPanel.add(centerPanel, BorderLayout.CENTER);
+        contentPanel.add(southPanel, BorderLayout.SOUTH);
 
-        add(label7);
-        add(jcb2);
-        jcb2.setSelectedIndex(0);
-        add(label8);
-        add(jtf4);
-        add(btn6);
+        northPanel.setLayout(new GridLayout(4, 1));
+        JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel1.add(label1);
+        panel1.add(jtf1);
+        panel1.add(label2);
+        panel1.add(jtf2);
+        panel1.add(btn1);
+        panel1.add(label3);
+        panel1.add(btn2);
+        northPanel.add(panel1);
 
-        add(jsp);
-        add(btn7);
-        add(btn8);
-        add(btn3);
-        add(label4);
-        add(btn4);
+        JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel2.add(label6);
+        panel2.add(jcb);
+        northPanel.add(panel2);
 
-        btn2.addKeyListener(new MyListener());
+        JPanel panel7 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel7.add(label5);
+        panel7.add(jtf3);
+        panel7.add(btnDelay);
+        northPanel.add(panel7);
+
+        JPanel panel4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel4.add(label7);
+        panel4.add(jcb2);
+        panel4.add(jtf4);
+        panel4.add(label8);
+        panel4.add(btn6);
+        northPanel.add(panel4);
+
+        centerPanel.setLayout(new GridLayout(2, 1));
+        JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel3.add(lblInputContent);
+        jspContent.setPreferredSize(new Dimension(200, 90));
+        panel3.add(jspContent);
+        panel3.add(btnInputContent);
+        centerPanel.add(panel3);
+
+        // 脚本框
+        JPanel panel6 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel6.add(lblScript);
+        jsp.setPreferredSize(new Dimension(300, 90));
+        panel6.add(jsp);
+        centerPanel.add(panel6);
+
+        JPanel panel5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel5.add(btn7);
+        panel5.add(btn8);
+        panel5.add(btnStart);
+        panel5.add(label4);
+        panel5.add(btn4);
+        southPanel.add(panel5);
+
         addMouseListener(this);
         addMouseMotionListener(this);
         btn1.addActionListener(this);
         btn2.addActionListener(this);
-        btn3.addActionListener(this);
-        btn3.addKeyListener(new MyListener());
+        btnStart.addActionListener(this);
+        btn2.addKeyListener(new MyListener());
+        btnStart.addKeyListener(new MyListener());
         btn4.addKeyListener(new MyListener());
         btn4.addActionListener(this);
         btn4.setEnabled(false);
         jcb.addActionListener(this);
-        btn5.addActionListener(this);
+        btnDelay.addActionListener(this);
+        btnInputContent.addActionListener(this);
         jcb2.addActionListener(this);
         btn6.addActionListener(this);
         btn7.addActionListener(this);
         btn8.addActionListener(this);
-
     }
 
     public void run() {
@@ -191,28 +208,29 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
             jta.append("\"/>\n");
             jta.append("</loop>");
         }
-        if (btn3.equals(arg0.getSource())) {
+        if (btnStart.equals(arg0.getSource())) {
             btn4.setEnabled(true);
-            btn3.setEnabled(false);
+            btnStart.setEnabled(false);
             try {
-                FileWriter fw = new FileWriter(new File("info.xml"));
-                fw.write(jta.getText().toString());
+                OutputStream fw = new FileOutputStream("info.xml");
+                PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fw,"UTF-8")));
+                out.write(jta.getText().toString());
+                out.flush();
+                out.close();
                 fw.close();
             } catch (IOException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
 
             try {
                 new thdStart();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
         if (btn4.equals(arg0.getSource())) {
             thdStart.state = true;
-            btn3.setEnabled(true);
+            btnStart.setEnabled(true);
             btn4.setEnabled(false);
         }
         if (jcb.equals(arg0.getSource())) {
@@ -260,7 +278,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
             jta.append("\"/>\n");
             jta.append("</loop>");
         }
-        if (btn5.equals(arg0.getSource())) {
+        if (btnDelay.equals(arg0.getSource())) {
 
             String str = jtf3.getText();
             try {
@@ -283,7 +301,6 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
 
             if ((str.length() > 0) && (((c = str.charAt(0)) >= '0' && c <= '9')
                     || (c >= 'A' && c <= 'Z'))) {
-
                 str = jta.getText();
                 jta.setText(str.substring(0, str.lastIndexOf("</loop>")));
 
@@ -320,7 +337,6 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
             int returnVal = chooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
-                //    System.out.println(file.getPath());
 
                 try {
                     FileReader fr = new FileReader(file);
@@ -328,19 +344,16 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
                     int rs;
                     jta.setText("");
                     while ((rs = fr.read(buf)) > 0) {
-                        //System.out.println(new String(buf,0,rs));
                         jta.append(new String(buf, 0, rs));
                     }
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
         }
         if (btn8.equals(arg0.getSource())) {
             JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                    "xml", "xml");
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("xml", "xml");
             chooser.setFileFilter(filter);
             int returnVal = chooser.showSaveDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -350,11 +363,25 @@ public class GamePanel extends JPanel implements Runnable, ActionListener,
                     fw.write(jta.getText().toString());
                     fw.close();
                 } catch (IOException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             }
+        }
+        if (btnInputContent.equals(arg0.getSource())) {
 
+            String content = txtInputContent.getText();
+            if(!content.isEmpty() && content != "") {
+                try {
+                    String str = jta.getText();
+                    jta.setText(str.substring(0, str.lastIndexOf("</loop>")));
+                    jta.append("<input value=\"");
+                    jta.append(content);
+                    jta.append("\"/>\n");
+                    jta.append("</loop>");
+                } catch (Exception e) {
+                    jtf3.setText("延时时间设置错误!");
+                }
+            }
         }
     }
 

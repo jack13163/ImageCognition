@@ -68,14 +68,8 @@ public class BMPReader2 {
 			ImageDigital.writeImg(img, "jpg", s2);
 			 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// ImageDigital.writeImg(pixs, br.width, br.height, "bmp", s2);
-
-		
-		// BufferedImage img = ImageDigital.read//new BufferedImage();width,
-		// height, BufferedImage.TYPE_3BYTE_BGR
 
 		System.out.println(br.transInt(0x3ec30000));
 	}

@@ -2,27 +2,57 @@ package app;
 
 import confnition.CoordBean;
 import confnition.ImageCognition;
+import marvin.image.MarvinImage;
+import marvin.image.MarvinSegment;
+import marvin.io.MarvinImageIO;
 import utis.PerceptualHash;
+import utis.TimeHelper;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import static marvin.MarvinPluginCollection.*;
+
 public class Image {
     public static void main(String[] args) throws Exception {
-        findImage4FullScreen("data/images/20204408134403.png", "data/images/20204408134436.png", ImageCognition.SIM_ACCURATE_VERY);
-        if(findImageByThumbnail("data/images/normal.png", "data/images/small.png")){
-            System.out.println("两个图片相似");
-        }
+        TimeHelper.startWatch(new TimeHelper.Job() {
+            @Override
+            public void run() {
+                findImageByMarvin("data/images/20204408134403.png", "data/images/20204408134436.png", 0.75);
+            }
+        });
+
+        TimeHelper.startWatch(new TimeHelper.Job() {
+            @Override
+            public void run() {
+                try {
+                    findImage4FullScreen("data/images/20204408134403.png",
+                            "data/images/20204408134436.png",
+                            ImageCognition.SIM_ACCURATE_VERY);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        TimeHelper.startWatch(new TimeHelper.Job() {
+            @Override
+            public void run() {
+                try {
+                    if(findImageByThumbnail("data/images/normal.png", "data/images/small.png")){
+                        System.out.println("两个图片相似");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -70,5 +100,32 @@ public class Image {
         BufferedImage image2 = ImageIO.read(new File(tofind));
         boolean code = PerceptualHash.perceptualHashSimilarity(image1, image2);
         return code;
+    }
+
+    /**
+     * 根据Marvin实现找图功能
+     * @param src
+     * @param tofind
+     * @param similarity
+     * @return
+     */
+    public static boolean findImageByMarvin(String src, String tofind, double similarity){
+        MarvinImage window = MarvinImageIO.loadImage(src);
+        MarvinImage eclipse = MarvinImageIO.loadImage(tofind);
+
+        MarvinSegment seg1 = findSubimage(eclipse, window, 0, 0, similarity);
+        if(seg1 != null){
+            System.out.println("Found:" + seg1.x1 + " " + seg1.y1 + " width:"+ (seg1.x2-seg1.x1) + " height:"+(seg1.y2-seg1.y1) );
+            drawRect(window, seg1.x1, seg1.y1, seg1.x2-seg1.x1, seg1.y2-seg1.y1);
+            MarvinImageIO.saveImage(window, "data/images/result.png");
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private static void drawRect(MarvinImage image, int x, int y, int width, int height){
+        x-=4; y-=4; width+=8; height+=8;
+        image.drawRect(x, y, width, height, Color.red);
     }
 }
