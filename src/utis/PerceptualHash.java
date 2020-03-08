@@ -16,8 +16,6 @@ public class PerceptualHash {
     public static boolean perceptualHashSimilarity(BufferedImage src1, BufferedImage src2) {
         String code1 = perceptualHashSimilarity(src1);
         String code2 = perceptualHashSimilarity(src2);
-        System.out.println(code1);
-        System.out.println(code2);
         char[] ch1 = code1.toCharArray();
         char[] ch2 = code2.toCharArray();
         int diffCount = 0;
@@ -26,7 +24,6 @@ public class PerceptualHash {
                 diffCount++;
             }
         }
-        System.out.println(diffCount);
         return diffCount <= 5;
     }
 

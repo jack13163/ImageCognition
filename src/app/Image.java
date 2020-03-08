@@ -19,13 +19,15 @@ import javax.imageio.ImageIO;
 
 public class Image {
     public static void main(String[] args) throws Exception {
-        findImage4FullScreen("data/images/20204408134403.png",
-                "data/images/20204408134436.png",
-                ImageCognition.SIM_ACCURATE_VERY);
+        findImage4FullScreen("data/images/20204408134403.png", "data/images/20204408134436.png", ImageCognition.SIM_ACCURATE_VERY);
+        if(findImageByThumbnail("data/images/normal.png", "data/images/small.png")){
+            System.out.println("两个图片相似");
+        }
     }
 
     /**
      * 精确找图
+     *
      * @param src
      * @param tofind
      * @param sim
@@ -58,6 +60,7 @@ public class Image {
 
     /**
      * 根据缩略图找图
+     *
      * @param src
      * @param tofind
      * @return
@@ -65,7 +68,7 @@ public class Image {
     public static boolean findImageByThumbnail(String src, String tofind) throws IOException {
         BufferedImage image1 = ImageIO.read(new File(src));
         BufferedImage image2 = ImageIO.read(new File(tofind));
-        boolean code = PerceptualHash.perceptualHashSimilarity(image1,image2);
+        boolean code = PerceptualHash.perceptualHashSimilarity(image1, image2);
         return code;
     }
 }
