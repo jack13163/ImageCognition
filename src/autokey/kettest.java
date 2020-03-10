@@ -16,7 +16,7 @@ public class kettest extends JFrame {
         add(jp);
 
         int width = 420;
-        int height = 500;
+        int height = 600;
         this.setBounds((tk.width - width) / 2, (tk.height - height) / 2, width, height);
         this.setVisible(true);
         setAlwaysOnTop(true);

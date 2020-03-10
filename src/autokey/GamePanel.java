@@ -1,5 +1,7 @@
 package autokey;
 
+import utis.screencut.Screenshot;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,14 +11,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.*;
 import java.util.Vector;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 
@@ -79,14 +74,14 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         JPanel northPanel = new JPanel();
         JPanel centerPanel = new JPanel();
         JPanel southPanel = new JPanel();
-        northPanel.setPreferredSize(new Dimension(400,200));
-        centerPanel.setPreferredSize(new Dimension(400,200));
-        southPanel.setPreferredSize(new Dimension(400,100));
+        northPanel.setPreferredSize(new Dimension(400, 280));
+        centerPanel.setPreferredSize(new Dimension(400, 200));
+        southPanel.setPreferredSize(new Dimension(400, 100));
         contentPanel.add(northPanel, BorderLayout.NORTH);
         contentPanel.add(centerPanel, BorderLayout.CENTER);
         contentPanel.add(southPanel, BorderLayout.SOUTH);
 
-        northPanel.setLayout(new GridLayout(4, 1));
+        northPanel.setLayout(new GridLayout(5, 1));
         JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel1.add(lblX);
         panel1.add(txtX);
@@ -95,6 +90,10 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         panel1.add(btnLocation);
         panel1.add(btnAddLocation);
         northPanel.add(panel1);
+
+        JPanel panel8 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel8.add(btnScreencut);
+        northPanel.add(panel8);
 
         JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel2.add(lblClickType);
@@ -141,8 +140,8 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         addMouseMotionListener(this);
         btnLocation.addActionListener(this);
         btnAddLocation.addActionListener(this);
+        btnScreencut.addActionListener(this);
         btnStart.addActionListener(this);
-        btnAddLocation.addKeyListener(new MyListener());
         btnStart.addKeyListener(new MyListener());
         btnStop.addKeyListener(new MyListener());
         btnStop.addActionListener(this);
@@ -154,6 +153,8 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         btnAddKey.addActionListener(this);
         btnImport.addActionListener(this);
         btnExport.addActionListener(this);
+
+        addKeyListener(new MyListener());
     }
 
     public void run() {
@@ -206,12 +207,28 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
             txtScript.append("\"/>\n");
             txtScript.append("</loop>");
         }
+        if (btnScreencut.equals(arg0.getSource())) {
+
+            try {
+                Screenshot accessibleScreenshot = new Screenshot(new JFrame(), false);
+                accessibleScreenshot.setVisible(true);
+                String str = txtScript.getText();
+                txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
+                txtScript.append("<delay time=\"");
+                str = txtDelay.getText();
+                txtScript.append(str);
+                txtScript.append("\"/>\n");
+                txtScript.append("</loop>");
+            } catch (Exception e) {
+                txtDelay.setText("延时时间设置错误!");
+            }
+        }
         if (btnStart.equals(arg0.getSource())) {
             btnStop.setEnabled(true);
             btnStart.setEnabled(false);
             try {
                 OutputStream fw = new FileOutputStream("info.xml");
-                PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fw,"UTF-8")));
+                PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fw, "UTF-8")));
                 out.write(txtScript.getText().toString());
                 out.flush();
                 out.close();
@@ -368,7 +385,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         if (btnInputContent.equals(arg0.getSource())) {
 
             String content = txtInputContent.getText();
-            if(!content.isEmpty() && content != "") {
+            if (!content.isEmpty() && content != "") {
                 try {
                     String str = txtScript.getText();
                     txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));

@@ -1,4 +1,4 @@
-package screencut;
+package utis.screencut;
 
 import javax.swing.*;
 import java.awt.event.*;

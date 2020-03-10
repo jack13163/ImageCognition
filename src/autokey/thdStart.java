@@ -1,11 +1,8 @@
-package autokey;//package autokey;
+package autokey;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -78,7 +75,7 @@ public class thdStart implements Runnable {
                 doLoop(fatherNode);
             }
             GamePanel.btnStart.setEnabled(true);
-            GamePanel.btn4.setEnabled(false);
+            GamePanel.btnStop.setEnabled(false);
         }
     }
 

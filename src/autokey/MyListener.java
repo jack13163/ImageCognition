@@ -13,7 +13,7 @@ public class MyListener extends KeyAdapter {
 			// 结束运行
 			thdStart.state=true;
 			GamePanel.btnStart.setEnabled(true);
-			GamePanel.btn4.setEnabled(false);
+			GamePanel.btnStop.setEnabled(false);
 		}
 	}
 }

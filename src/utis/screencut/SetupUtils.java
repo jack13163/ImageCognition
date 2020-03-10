@@ -1,4 +1,4 @@
-package screencut;
+package utis.screencut;
 
 
 import net.jimmc.jshortcut.JShellLink;

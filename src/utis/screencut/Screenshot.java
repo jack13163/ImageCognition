@@ -1,4 +1,4 @@
-package screencut;
+package utis.screencut;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -56,6 +56,13 @@ public class Screenshot extends JWindow {
 	public Screenshot(JFrame jf, Boolean bl, SetupMsg sm) throws AWTException {
 		this.jf = jf;
 		this.sm = sm;
+		init(bl);
+	}
+
+	// 无障碍初始化
+	public Screenshot(JFrame jf, Boolean bl) throws AWTException {
+		this.jf = jf;
+		this.sm = new SetupMsg();
 		init(bl);
 	}
 

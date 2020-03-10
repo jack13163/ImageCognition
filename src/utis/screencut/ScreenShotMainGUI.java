@@ -1,4 +1,4 @@
-package screencut;
+package utis.screencut;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
