@@ -21,28 +21,29 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class GamePanel extends JPanel implements Runnable, ActionListener, MouseListener, MouseMotionListener {
-    JLabel label1 = new JLabel("X:");
-    JTextField jtf1 = new JTextField(5);
-    JLabel label2 = new JLabel("Y:");
-    JTextField jtf2 = new JTextField(5);
-    JButton btn1 = new JButton("定位");
-    JLabel label3 = new JLabel("（按ESC停止）");
-    JButton btn2 = new JButton("添加");
+    JLabel lblX = new JLabel("X:");
+    JTextField txtX = new JTextField(5);
+    JLabel lblY = new JLabel("Y:");
+    JTextField txtY = new JTextField(5);
+    JButton btnLocation = new JButton("定位");
+    JButton btnAddLocation = new JButton("添加");
+
+    JButton btnScreencut = new JButton("截图");
 
     Vector<String> vector = new Vector<String>();
-    JLabel label6 = new JLabel("点击方式:");
-    JComboBox jcb = new JComboBox(vector);
+    JLabel lblClickType = new JLabel("点击方式:");
+    JComboBox btnClickType = new JComboBox(vector);
 
-    JLabel label5 = new JLabel("延时(ms):");
-    JTextField jtf3 = new JTextField("2000", 5);
+    JLabel lblDelay = new JLabel("延时(ms):");
+    JTextField txtDelay = new JTextField("2000", 5);
     JButton btnDelay = new JButton("添加");
 
-    JLabel label7 = new JLabel("按键方式:");
+    JLabel lblKeyType = new JLabel("按键方式:");
     Vector<String> vector2 = new Vector<String>();
-    JComboBox jcb2 = new JComboBox(vector2);
-    JLabel label8 = new JLabel("0~9|A~Z:");
-    JTextField jtf4 = new JTextField(10);
-    JButton btn6 = new JButton("添加");
+    JComboBox cbKeyType = new JComboBox(vector2);
+    JLabel lblKey = new JLabel("0~9|A~Z:");
+    JTextField txtKey = new JTextField(10);
+    JButton btnAddKey = new JButton("添加");
 
     JLabel lblInputContent = new JLabel("输入内容:");
     JTextArea txtInputContent = new JTextArea();
@@ -50,14 +51,13 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
     JButton btnInputContent = new JButton("添加");
 
     JLabel lblScript = new JLabel("脚本内容:");
-    JTextArea jta = new JTextArea("<loop id=\"1\">\n</loop>");
-    JScrollPane jsp = new JScrollPane(jta);
+    JTextArea txtScript = new JTextArea("<loop id=\"1\">\n</loop>");
+    JScrollPane jsp = new JScrollPane(txtScript);
 
-    JButton btn7 = new JButton("导入");
-    JButton btn8 = new JButton("导出");
+    JButton btnImport = new JButton("导入");
+    JButton btnExport = new JButton("导出");
     static JButton btnStart = new JButton("开始");
-    JLabel label4 = new JLabel("（按ESC停止）");
-    static JButton btn4 = new JButton("停止");
+    static JButton btnStop = new JButton("停止");
 
     public static boolean xystate = false;
 
@@ -88,32 +88,31 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
 
         northPanel.setLayout(new GridLayout(4, 1));
         JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel1.add(label1);
-        panel1.add(jtf1);
-        panel1.add(label2);
-        panel1.add(jtf2);
-        panel1.add(btn1);
-        panel1.add(label3);
-        panel1.add(btn2);
+        panel1.add(lblX);
+        panel1.add(txtX);
+        panel1.add(lblY);
+        panel1.add(txtY);
+        panel1.add(btnLocation);
+        panel1.add(btnAddLocation);
         northPanel.add(panel1);
 
         JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel2.add(label6);
-        panel2.add(jcb);
+        panel2.add(lblClickType);
+        panel2.add(btnClickType);
         northPanel.add(panel2);
 
         JPanel panel7 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel7.add(label5);
-        panel7.add(jtf3);
+        panel7.add(lblDelay);
+        panel7.add(txtDelay);
         panel7.add(btnDelay);
         northPanel.add(panel7);
 
         JPanel panel4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel4.add(label7);
-        panel4.add(jcb2);
-        panel4.add(jtf4);
-        panel4.add(label8);
-        panel4.add(btn6);
+        panel4.add(lblKeyType);
+        panel4.add(cbKeyType);
+        panel4.add(txtKey);
+        panel4.add(lblKey);
+        panel4.add(btnAddKey);
         northPanel.add(panel4);
 
         centerPanel.setLayout(new GridLayout(2, 1));
@@ -132,44 +131,43 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         centerPanel.add(panel6);
 
         JPanel panel5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel5.add(btn7);
-        panel5.add(btn8);
+        panel5.add(btnImport);
+        panel5.add(btnExport);
         panel5.add(btnStart);
-        panel5.add(label4);
-        panel5.add(btn4);
+        panel5.add(btnStop);
         southPanel.add(panel5);
 
         addMouseListener(this);
         addMouseMotionListener(this);
-        btn1.addActionListener(this);
-        btn2.addActionListener(this);
+        btnLocation.addActionListener(this);
+        btnAddLocation.addActionListener(this);
         btnStart.addActionListener(this);
-        btn2.addKeyListener(new MyListener());
+        btnAddLocation.addKeyListener(new MyListener());
         btnStart.addKeyListener(new MyListener());
-        btn4.addKeyListener(new MyListener());
-        btn4.addActionListener(this);
-        btn4.setEnabled(false);
-        jcb.addActionListener(this);
+        btnStop.addKeyListener(new MyListener());
+        btnStop.addActionListener(this);
+        btnStop.setEnabled(false);
+        btnClickType.addActionListener(this);
         btnDelay.addActionListener(this);
         btnInputContent.addActionListener(this);
-        jcb2.addActionListener(this);
-        btn6.addActionListener(this);
-        btn7.addActionListener(this);
-        btn8.addActionListener(this);
+        cbKeyType.addActionListener(this);
+        btnAddKey.addActionListener(this);
+        btnImport.addActionListener(this);
+        btnExport.addActionListener(this);
     }
 
     public void run() {
         while (true) {
             synchronized (this) {
                 if (xystate) {
-                    btn1.setEnabled(true);
+                    btnLocation.setEnabled(true);
                     xystate = false;
                     break;
                 }
             }
 
-            jtf1.setText("" + MouseInfo.getPointerInfo().getLocation().getX());
-            jtf2.setText("" + MouseInfo.getPointerInfo().getLocation().getY());
+            txtX.setText("" + MouseInfo.getPointerInfo().getLocation().getX());
+            txtY.setText("" + MouseInfo.getPointerInfo().getLocation().getY());
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {
@@ -179,42 +177,42 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
     }
 
     public void actionPerformed(ActionEvent arg0) {
-        if (btn1.equals(arg0.getSource())) {
-            btn1.setEnabled(false);
+        if (btnLocation.equals(arg0.getSource())) {
+            btnLocation.setEnabled(false);
             new Thread(this).start();
         }
-        if (btn2.equals(arg0.getSource())) {
-            String str = jta.getText();
-            jta.setText(str.substring(0, str.lastIndexOf("</loop>")));
-            jta.append("<move x=\"");
-            String temp = jtf1.getText();
+        if (btnAddLocation.equals(arg0.getSource())) {
+            String str = txtScript.getText();
+            txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
+            txtScript.append("<move x=\"");
+            String temp = txtX.getText();
             for (int i = 0; i < temp.length(); i++) {
                 if (temp.charAt(i) != '.') {
-                    jta.append("" + temp.charAt(i));
+                    txtScript.append("" + temp.charAt(i));
                 } else {
                     break;
                 }
             }
 
-            jta.append("\" y=\"");
-            temp = jtf2.getText();
+            txtScript.append("\" y=\"");
+            temp = txtY.getText();
             for (int i = 0; i < temp.length(); i++) {
                 if (temp.charAt(i) != '.') {
-                    jta.append("" + temp.charAt(i));
+                    txtScript.append("" + temp.charAt(i));
                 } else {
                     break;
                 }
             }
-            jta.append("\"/>\n");
-            jta.append("</loop>");
+            txtScript.append("\"/>\n");
+            txtScript.append("</loop>");
         }
         if (btnStart.equals(arg0.getSource())) {
-            btn4.setEnabled(true);
+            btnStop.setEnabled(true);
             btnStart.setEnabled(false);
             try {
                 OutputStream fw = new FileOutputStream("info.xml");
                 PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fw,"UTF-8")));
-                out.write(jta.getText().toString());
+                out.write(txtScript.getText().toString());
                 out.flush();
                 out.close();
                 fw.close();
@@ -228,109 +226,109 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
                 e.printStackTrace();
             }
         }
-        if (btn4.equals(arg0.getSource())) {
+        if (btnStop.equals(arg0.getSource())) {
             thdStart.state = true;
             btnStart.setEnabled(true);
-            btn4.setEnabled(false);
+            btnStop.setEnabled(false);
         }
-        if (jcb.equals(arg0.getSource())) {
-            String str = jta.getText();
-            jta.setText(str.substring(0, str.lastIndexOf("</loop>")));
-            jta.append("<mousePress id=\"");
-            switch (jcb.getSelectedIndex()) {
+        if (btnClickType.equals(arg0.getSource())) {
+            String str = txtScript.getText();
+            txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
+            txtScript.append("<mousePress id=\"");
+            switch (btnClickType.getSelectedIndex()) {
                 case 0: {
-                    jta.append("left");
-                    jta.append("\"/>\n");
-                    jta.append("<mouseRelease id=\"");
-                    jta.append("left");
+                    txtScript.append("left");
+                    txtScript.append("\"/>\n");
+                    txtScript.append("<mouseRelease id=\"");
+                    txtScript.append("left");
                     break;
                 }
                 case 1: {
-                    jta.append("right");
-                    jta.append("\"/>\n");
-                    jta.append("<mouseRelease id=\"");
-                    jta.append("right");
+                    txtScript.append("right");
+                    txtScript.append("\"/>\n");
+                    txtScript.append("<mouseRelease id=\"");
+                    txtScript.append("right");
                     break;
                 }
                 case 2: {
-                    jta.append("left");
-                    jta.append("\"/>\n");
-                    jta.append("<mouseRelease id=\"");
-                    jta.append("left");
-                    jta.append("\"/>\n");
-                    jta.append("<mousePress id=\"");
-                    jta.append("left");
-                    jta.append("\"/>\n");
-                    jta.append("<mouseRelease id=\"");
-                    jta.append("left");
+                    txtScript.append("left");
+                    txtScript.append("\"/>\n");
+                    txtScript.append("<mouseRelease id=\"");
+                    txtScript.append("left");
+                    txtScript.append("\"/>\n");
+                    txtScript.append("<mousePress id=\"");
+                    txtScript.append("left");
+                    txtScript.append("\"/>\n");
+                    txtScript.append("<mouseRelease id=\"");
+                    txtScript.append("left");
                     break;
                 }
                 case 3: {
-                    jta.append("center");
-                    jta.append("\"/>\n");
-                    jta.append("<mouseRelease id=\"");
-                    jta.append("center");
+                    txtScript.append("center");
+                    txtScript.append("\"/>\n");
+                    txtScript.append("<mouseRelease id=\"");
+                    txtScript.append("center");
                     break;
                 }
 
             }
 
-            jta.append("\"/>\n");
-            jta.append("</loop>");
+            txtScript.append("\"/>\n");
+            txtScript.append("</loop>");
         }
         if (btnDelay.equals(arg0.getSource())) {
 
-            String str = jtf3.getText();
+            String str = txtDelay.getText();
             try {
                 Long.parseLong(str);
-                str = jta.getText();
-                jta.setText(str.substring(0, str.lastIndexOf("</loop>")));
-                jta.append("<delay time=\"");
-                str = jtf3.getText();
-                jta.append(str);
-                jta.append("\"/>\n");
-                jta.append("</loop>");
+                str = txtScript.getText();
+                txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
+                txtScript.append("<delay time=\"");
+                str = txtDelay.getText();
+                txtScript.append(str);
+                txtScript.append("\"/>\n");
+                txtScript.append("</loop>");
             } catch (Exception e) {
-                jtf3.setText("延时时间设置错误!");
+                txtDelay.setText("延时时间设置错误!");
             }
         }
-        if (btn6.equals(arg0.getSource())) {
+        if (btnAddKey.equals(arg0.getSource())) {
             String str;
             char c = 0;
-            str = jtf4.getText();
+            str = txtKey.getText();
 
             if ((str.length() > 0) && (((c = str.charAt(0)) >= '0' && c <= '9')
                     || (c >= 'A' && c <= 'Z'))) {
-                str = jta.getText();
-                jta.setText(str.substring(0, str.lastIndexOf("</loop>")));
+                str = txtScript.getText();
+                txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
 
-                switch (jcb2.getSelectedIndex()) {
+                switch (cbKeyType.getSelectedIndex()) {
                     case 0: {
-                        jta.append("<keyPress value=\"");
-                        jta.append(String.valueOf((int) c));
+                        txtScript.append("<keyPress value=\"");
+                        txtScript.append(String.valueOf((int) c));
                         break;
                     }
                     case 1: {
-                        jta.append("<keyRelease value=\"");
-                        jta.append(String.valueOf((int) c));
+                        txtScript.append("<keyRelease value=\"");
+                        txtScript.append(String.valueOf((int) c));
                         break;
                     }
                     case 2: {
-                        jta.append("<keyPress value=\"");
-                        jta.append(String.valueOf((int) c));
-                        jta.append("\"/>\n");
-                        jta.append("<keyRelease value=\"");
-                        jta.append(String.valueOf((int) c));
+                        txtScript.append("<keyPress value=\"");
+                        txtScript.append(String.valueOf((int) c));
+                        txtScript.append("\"/>\n");
+                        txtScript.append("<keyRelease value=\"");
+                        txtScript.append(String.valueOf((int) c));
                         break;
                     }
 
                 }
 
-                jta.append("\"/>\n");
-                jta.append("</loop>");
+                txtScript.append("\"/>\n");
+                txtScript.append("</loop>");
             }
         }
-        if (btn7.equals(arg0.getSource())) {
+        if (btnImport.equals(arg0.getSource())) {
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("xml5", "xml");
             chooser.setFileFilter(filter);
@@ -342,16 +340,16 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
                     FileReader fr = new FileReader(file);
                     char[] buf = new char[200];
                     int rs;
-                    jta.setText("");
+                    txtScript.setText("");
                     while ((rs = fr.read(buf)) > 0) {
-                        jta.append(new String(buf, 0, rs));
+                        txtScript.append(new String(buf, 0, rs));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-        if (btn8.equals(arg0.getSource())) {
+        if (btnExport.equals(arg0.getSource())) {
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("xml", "xml");
             chooser.setFileFilter(filter);
@@ -360,7 +358,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
                 File file = chooser.getSelectedFile();
                 try {
                     FileWriter fw = new FileWriter(file);
-                    fw.write(jta.getText().toString());
+                    fw.write(txtScript.getText().toString());
                     fw.close();
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -372,14 +370,14 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
             String content = txtInputContent.getText();
             if(!content.isEmpty() && content != "") {
                 try {
-                    String str = jta.getText();
-                    jta.setText(str.substring(0, str.lastIndexOf("</loop>")));
-                    jta.append("<input value=\"");
-                    jta.append(content);
-                    jta.append("\"/>\n");
-                    jta.append("</loop>");
+                    String str = txtScript.getText();
+                    txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
+                    txtScript.append("<input value=\"");
+                    txtScript.append(content);
+                    txtScript.append("\"/>\n");
+                    txtScript.append("</loop>");
                 } catch (Exception e) {
-                    jtf3.setText("延时时间设置错误!");
+                    txtDelay.setText("延时时间设置错误!");
                 }
             }
         }
