@@ -8,23 +8,34 @@ import marvin.io.MarvinImageIO;
 import utis.PerceptualHash;
 import utis.TimeHelper;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import static marvin.MarvinPluginCollection.*;
+import static marvin.MarvinPluginCollection.findSubimage;
+import static marvin.MarvinPluginCollection.findTextRegions;
 
 public class Image {
     public static void main(String[] args) throws Exception {
+//        // 屏幕截图
+//        captureScreen("screen.png", "data/images/");
+//
+//        // 文字区域查找
+//        TimeHelper.startWatch(new TimeHelper.Job() {
+//            @Override
+//            public void run() {
+//                findTextRegionByMarvin("data/images/screen.png");
+//            }
+//        });
+
+
         TimeHelper.startWatch(new TimeHelper.Job() {
             @Override
             public void run() {
-                findImageByMarvin("data/images/20204408134403.png", "data/images/20204408134436.png", 0.75);
+                findImageByMarvin("data/images/screen.png", "data/images/wx_max.png", 0.97);
             }
         });
 
@@ -32,8 +43,8 @@ public class Image {
             @Override
             public void run() {
                 try {
-                    findImage4FullScreen("data/images/20204408134403.png",
-                            "data/images/20204408134436.png",
+                    findImage4FullScreen("data/images/screen.png",
+                            "data/images/wx_max.png",
                             ImageCognition.SIM_ACCURATE_VERY);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -45,7 +56,7 @@ public class Image {
             @Override
             public void run() {
                 try {
-                    if(findImageByThumbnail("data/images/normal.png", "data/images/small.png")){
+                    if (findImageByThumbnail("data/images/normal.png", "data/images/small.png")) {
                         System.out.println("两个图片相似");
                     }
                 } catch (Exception e) {
@@ -104,28 +115,89 @@ public class Image {
 
     /**
      * 根据Marvin实现找图功能
+     *
      * @param src
      * @param tofind
      * @param similarity
      * @return
      */
-    public static boolean findImageByMarvin(String src, String tofind, double similarity){
+    public static boolean findImageByMarvin(String src, String tofind, double similarity) {
         MarvinImage window = MarvinImageIO.loadImage(src);
         MarvinImage eclipse = MarvinImageIO.loadImage(tofind);
 
         MarvinSegment seg1 = findSubimage(eclipse, window, 0, 0, similarity);
-        if(seg1 != null){
-            System.out.println("Found:" + seg1.x1 + " " + seg1.y1 + " width:"+ (seg1.x2-seg1.x1) + " height:"+(seg1.y2-seg1.y1) );
-            drawRect(window, seg1.x1, seg1.y1, seg1.x2-seg1.x1, seg1.y2-seg1.y1);
+        if (seg1 != null) {
+            System.out.println("Found:" + seg1.x1 + " " + seg1.y1 + " width:" + (seg1.x2 - seg1.x1) + " height:" + (seg1.y2 - seg1.y1));
+            drawRect(window, seg1.x1, seg1.y1, seg1.x2 - seg1.x1, seg1.y2 - seg1.y1);
             MarvinImageIO.saveImage(window, "data/images/result.png");
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    private static void drawRect(MarvinImage image, int x, int y, int width, int height){
-        x-=4; y-=4; width+=8; height+=8;
+
+    /**
+     * 根据Marvin实现文字功能
+     *
+     * @param src
+     * @return
+     */
+    public static List<MarvinSegment> findTextRegionByMarvin(String src) {
+        MarvinImage window = MarvinImageIO.loadImage(src);
+
+        int maxWhiteSpace = 10;
+        int maxFontLineWidth = 10;
+        int minTextWidth = 30;
+        int grayScaleThreshold = 127;
+
+        List<MarvinSegment> segs = findTextRegions(window, maxWhiteSpace, maxFontLineWidth, minTextWidth, grayScaleThreshold);
+        for (int i = 0; i < segs.size(); i++) {
+            MarvinSegment segment = segs.get(i);
+            if (segment != null) {
+                System.out.println("Found:" + segment.x1 + " " + segment.y1 + " width:" + (segment.x2 - segment.x1) + " height:" + (segment.y2 - segment.y1));
+                drawRect(window, segment.x1, segment.y1, segment.x2 - segment.x1, segment.y2 - segment.y1);
+                MarvinImageIO.saveImage(window, "data/images/findtextregion.png");
+            }
+        }
+        return segs;
+    }
+
+    private static void drawRect(MarvinImage image, int x, int y, int width, int height) {
         image.drawRect(x, y, width, height, Color.red);
+    }
+
+    /**
+     * 截屏
+     *
+     * @param fileName
+     * @param folder
+     * @throws Exception
+     */
+    public static BufferedImage captureScreen(String fileName, String folder) throws Exception {
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle screenRectangle = new Rectangle(screenSize);
+        Robot robot = new Robot();
+        BufferedImage image = robot.createScreenCapture(screenRectangle);
+        // 截图保存的路径
+        File screenFile = new File(folder);
+        // 如果路径不存在,则创建
+        if (!screenFile.getParentFile().exists()) {
+            screenFile.getParentFile().mkdirs();
+        }
+        //判断文件是否存在，不存在就创建文件
+        if (!screenFile.exists() && !screenFile.isDirectory()) {
+            screenFile.mkdir();
+        }
+
+        File f = new File(screenFile, fileName);
+        ImageIO.write(image, "png", f);
+
+        //自动打开
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+            Desktop.getDesktop().open(f);
+        }
+        return image;
     }
 }
