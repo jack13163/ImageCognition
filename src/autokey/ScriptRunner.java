@@ -1,13 +1,12 @@
 package autokey;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.util.Vector;
 
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import confnition.CoordBean;
+import confnition.ImageCognition;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -16,7 +15,12 @@ import org.w3c.dom.NodeList;
 import utis.Bezier;
 import utis.ClipboardHelper;
 
-public class thdStart implements Runnable {
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.Vector;
+
+public class ScriptRunner implements Runnable {
     Robot robot;
     static boolean state;
     Document doc = null;
@@ -31,7 +35,7 @@ public class thdStart implements Runnable {
         doc = db.parse(new File(xmlFile));
     }
 
-    public thdStart() throws Exception {
+    public ScriptRunner() throws Exception {
         init("info.xml");
 
         try {
@@ -96,26 +100,35 @@ public class thdStart implements Runnable {
                 if ("delay".equals(nodename)) {
                     robot.delay(Integer.parseInt(attributevalue));
                 }
+                if ("image".equals(nodename)) {
+                    try {
+                        // 屏幕截图
+                        FindImage.captureScreen("screen.png", "data/images/");
+                        // 找图
+                        java.util.List<CoordBean> results = FindImage.findImage4FullScreen("data/images/screen.png", attributevalue, ImageCognition.SIM_ACCURATE_VERY);
+                        if (results != null) {
+                            for (int i = 0; i < results.size(); i++) {
+                                // 找到图片中心
+                                CoordBean loc = results.get(i);
+                                int end_x = loc.getX() + 3;
+                                int end_y = loc.getY() + 3;
+                                moveMouseSlowly(end_x, end_y);
+                                robot.delay(1000);// 延时1秒
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, "无法找到图片", "提示",JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 if (("mouseMove".equals(nodename) || "move".equals(nodename)) && ("x".equals(attributename))) {
-                    // 获取鼠标当前位置
-                    Point p = MouseInfo.getPointerInfo().getLocation();
-                    int start_x = p.x;
-                    int start_y = p.y;
-
                     // 目标位置
                     int end_x = Integer.parseInt(loopattributes.item(0).getNodeValue());
                     int end_y = Integer.parseInt(loopattributes.item(1).getNodeValue());
 
-                    int step = 500;
-                    Vector<Point> points = Bezier.generatePoints(p,
-                            new Point((start_x + end_x) * 2 / 3, (start_y + end_y) / 3),
-                            new Point(end_x, end_y),
-                            500);
-                    for (int i = 0; i < step; i++) {
-                        robot.mouseMove(points.get(i).x, points.get(i).y);
-                        robot.delay(1);//停顿1毫秒
-                    }
-
+                    moveMouseSlowly(end_x, end_y);
                 }
                 if ("mousePress".equals(nodename) || "press".equals(nodename)) {
                     if ("left".equals(attributevalue)) {
@@ -159,6 +172,29 @@ public class thdStart implements Runnable {
                     ClipboardHelper.keyPressWithCtrl(KeyEvent.VK_V);
                 }
             }
+        }
+    }
+
+    /**
+     * 缓慢移动鼠标
+     * @param end_x
+     * @param end_y
+     */
+    public void moveMouseSlowly(int end_x, int end_y){
+
+        // 获取鼠标当前位置
+        Point p = MouseInfo.getPointerInfo().getLocation();
+        int start_x = p.x;
+        int start_y = p.y;
+
+        int step = 500;
+        Vector<Point> points = Bezier.generatePoints(p,
+                new Point((start_x + end_x) * 2 / 3, (start_y + end_y) / 3),
+                new Point(end_x, end_y),
+                500);
+        for (int i = 0; i < step; i++) {
+            robot.mouseMove(points.get(i).x, points.get(i).y);
+            robot.delay(1);//停顿1毫秒
         }
     }
 }

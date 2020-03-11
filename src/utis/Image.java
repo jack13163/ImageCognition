@@ -1,4 +1,4 @@
-package app;
+package utis;
 
 import confnition.CoordBean;
 import confnition.ImageCognition;
@@ -21,7 +21,7 @@ import static marvin.MarvinPluginCollection.findTextRegions;
 public class Image {
     public static void main(String[] args) throws Exception {
 //        // 屏幕截图
-//        captureScreen("screen.png", "data/images/");
+////        captureScreen("screen.png", "data/images/");
 //
 //        // 文字区域查找
 //        TimeHelper.startWatch(new TimeHelper.Job() {

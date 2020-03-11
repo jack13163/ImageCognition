@@ -11,7 +11,7 @@ public class MyListener extends KeyAdapter {
 			GamePanel.xystate=true;
 
 			// 结束运行
-			thdStart.state=true;
+			ScriptRunner.state=true;
 			GamePanel.btnStart.setEnabled(true);
 			GamePanel.btnStop.setEnabled(false);
 		}

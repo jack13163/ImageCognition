@@ -1,6 +1,5 @@
 package autokey;
 
-import utis.screencut.Screenshot;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -23,7 +22,10 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
     JButton btnLocation = new JButton("定位");
     JButton btnAddLocation = new JButton("添加");
 
+    JLabel lblFindImage= new JLabel("找图:");
+    JTextField txtImagePath = new JTextField(20);
     JButton btnScreencut = new JButton("截图");
+    JButton btnAddImage = new JButton("添加");
 
     Vector<String> vector = new Vector<String>();
     JLabel lblClickType = new JLabel("点击方式:");
@@ -92,7 +94,10 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         northPanel.add(panel1);
 
         JPanel panel8 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel8.add(lblFindImage);
+        panel8.add(txtImagePath);
         panel8.add(btnScreencut);
+        panel8.add(btnAddImage);
         northPanel.add(panel8);
 
         JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -141,6 +146,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         btnLocation.addActionListener(this);
         btnAddLocation.addActionListener(this);
         btnScreencut.addActionListener(this);
+        btnAddImage.addActionListener(this);
         btnStart.addActionListener(this);
         btnStart.addKeyListener(new MyListener());
         btnStop.addKeyListener(new MyListener());
@@ -210,13 +216,21 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         if (btnScreencut.equals(arg0.getSource())) {
 
             try {
-                Screenshot accessibleScreenshot = new Screenshot(new JFrame(), false);
-                accessibleScreenshot.setVisible(true);
+                // 截图
+                new ScreenShot((filepath -> {
+                    txtImagePath.setText(filepath);
+                })).setVisible(true);
+            } catch (Exception e) {
+                txtDelay.setText(e.getMessage());
+            }
+        }
+        if (btnAddImage.equals(arg0.getSource())) {
+
+            try {
                 String str = txtScript.getText();
                 txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
-                txtScript.append("<delay time=\"");
-                str = txtDelay.getText();
-                txtScript.append(str);
+                txtScript.append("<image src=\"");
+                txtScript.append(txtImagePath.getText());
                 txtScript.append("\"/>\n");
                 txtScript.append("</loop>");
             } catch (Exception e) {
@@ -238,13 +252,13 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
             }
 
             try {
-                new thdStart();
+                new ScriptRunner();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         if (btnStop.equals(arg0.getSource())) {
-            thdStart.state = true;
+            ScriptRunner.state = true;
             btnStart.setEnabled(true);
             btnStop.setEnabled(false);
         }
