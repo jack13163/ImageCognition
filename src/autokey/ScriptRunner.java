@@ -110,8 +110,8 @@ public class ScriptRunner implements Runnable {
                             for (int i = 0; i < results.size(); i++) {
                                 // 找到图片中心
                                 CoordBean loc = results.get(i);
-                                int end_x = loc.getX() + 3;
-                                int end_y = loc.getY() + 3;
+                                int end_x = loc.getX() + loc.getWidth() / 2;
+                                int end_y = loc.getY() + loc.getHeight() / 2;
                                 moveMouseSlowly(end_x, end_y);
                                 robot.delay(1000);// 延时1秒
                             }

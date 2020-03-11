@@ -119,6 +119,8 @@ public class ImageCognition {
                         CoordBean coord = new CoordBean();
                         coord.setX(x);
                         coord.setY(y);
+                        coord.setWidth(searchImage.getWidth());
+                        coord.setHeight(searchImage.getHeight());
                         list.add(coord);
                     }
                 }
