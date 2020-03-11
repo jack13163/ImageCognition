@@ -91,8 +91,7 @@ public class ScriptRunner implements Runnable {
 
             if (childNode instanceof Element) {
                 nodename = childNode.getNodeName();
-                NamedNodeMap loopattributes = childNodes.item(j)
-                        .getAttributes();
+                NamedNodeMap loopattributes = childNodes.item(j).getAttributes();
                 Node loopattribute = loopattributes.item(0);
                 attributename = loopattribute.getNodeName();
                 attributevalue = loopattribute.getNodeValue();
@@ -116,7 +115,7 @@ public class ScriptRunner implements Runnable {
                                 robot.delay(1000);// 延时1秒
                             }
                         } else {
-                            JOptionPane.showMessageDialog(null, "无法找到图片", "提示",JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "无法找到图片", "提示", JOptionPane.WARNING_MESSAGE);
                             return;
                         }
                     } catch (Exception e) {
@@ -177,10 +176,11 @@ public class ScriptRunner implements Runnable {
 
     /**
      * 缓慢移动鼠标
+     *
      * @param end_x
      * @param end_y
      */
-    public void moveMouseSlowly(int end_x, int end_y){
+    public void moveMouseSlowly(int end_x, int end_y) {
 
         // 获取鼠标当前位置
         Point p = MouseInfo.getPointerInfo().getLocation();

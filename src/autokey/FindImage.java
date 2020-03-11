@@ -67,7 +67,7 @@ public class FindImage {
         MarvinImage eclipse = MarvinImageIO.loadImage(tofind);
 
         MarvinSegment seg1 = findSubimage(eclipse, window, 0, 0, similarity);
-        return seg1;//        System.out.println("Found:" + seg1.x1 + " " + seg1.y1 + " width:" + (seg1.x2 - seg1.x1) + " height:" + (seg1.y2 - seg1.y1));
+        return seg1;
     }
 
 

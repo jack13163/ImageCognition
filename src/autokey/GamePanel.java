@@ -4,9 +4,8 @@ package autokey;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.Vector;
 
@@ -14,7 +13,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 
-public class GamePanel extends JPanel implements Runnable, ActionListener, MouseListener, MouseMotionListener {
+public class GamePanel extends JPanel implements Runnable, ActionListener {
     JLabel lblX = new JLabel("X:");
     JTextField txtX = new JTextField(5);
     JLabel lblY = new JLabel("Y:");
@@ -141,17 +140,13 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         panel5.add(btnStop);
         southPanel.add(panel5);
 
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        // 添加按钮的点击事件
         btnLocation.addActionListener(this);
         btnAddLocation.addActionListener(this);
         btnScreencut.addActionListener(this);
         btnAddImage.addActionListener(this);
         btnStart.addActionListener(this);
-        btnStart.addKeyListener(new MyListener());
-        btnStop.addKeyListener(new MyListener());
         btnStop.addActionListener(this);
-        btnStop.setEnabled(false);
         btnClickType.addActionListener(this);
         btnDelay.addActionListener(this);
         btnInputContent.addActionListener(this);
@@ -160,9 +155,31 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
         btnImport.addActionListener(this);
         btnExport.addActionListener(this);
 
-        addKeyListener(new MyListener());
+        // 添加按键监听
+        btnAddLocation.addKeyListener(new MyListener());// 注意：设置btnLocation为false后，无法响应按键操作，因此，添加下一个按钮的事件
+        btnStop.addKeyListener(new MyListener());
+
+        btnStop.setEnabled(false);
     }
 
+    class MyListener extends KeyAdapter {
+
+        public void keyPressed(KeyEvent arg0) {
+            if(arg0.getKeyCode()==KeyEvent.VK_ESCAPE){
+                // 结束定位
+                GamePanel.xystate=true;
+
+                // 结束运行
+                ScriptRunner.state=true;
+                GamePanel.btnStart.setEnabled(true);
+                GamePanel.btnStop.setEnabled(false);
+            }
+        }
+    }
+
+    /**
+     * 循环检测鼠标位置
+     */
     public void run() {
         while (true) {
             synchronized (this) {
@@ -185,8 +202,8 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
 
     public void actionPerformed(ActionEvent arg0) {
         if (btnLocation.equals(arg0.getSource())) {
-            btnLocation.setEnabled(false);
             new Thread(this).start();
+            btnLocation.setEnabled(false);
         }
         if (btnAddLocation.equals(arg0.getSource())) {
             String str = txtScript.getText();
@@ -412,38 +429,5 @@ public class GamePanel extends JPanel implements Runnable, ActionListener, Mouse
                 }
             }
         }
-    }
-
-    public void mouseClicked(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mouseEntered(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mouseExited(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mousePressed(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mouseReleased(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mouseDragged(MouseEvent arg0) {
-
-    }
-
-    public void mouseMoved(MouseEvent arg0) {
-
     }
 }
