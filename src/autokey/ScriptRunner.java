@@ -16,6 +16,7 @@ import utis.Bezier;
 import utis.ClipboardHelper;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Vector;
@@ -131,10 +132,10 @@ public class ScriptRunner implements Runnable {
                 }
                 if ("mousePress".equals(nodename) || "press".equals(nodename)) {
                     if ("left".equals(attributevalue)) {
-                        robot.mousePress(16);
+                        robot.mousePress(InputEvent.BUTTON1_MASK);// 左键
                     }
                     if ("right".equals(attributevalue)) {
-                        robot.mousePress(8);
+                        robot.mousePress(InputEvent.BUTTON3_MASK);// 右键
                     }
                     if ("center".equals(attributevalue)) {
                         robot.mousePress(8);
@@ -142,12 +143,12 @@ public class ScriptRunner implements Runnable {
                 }
                 if ("mouseRelease".equals(nodename) || "release".equals(nodename)) {
                     if ("left".equals(attributevalue)) {
-                        robot.mouseRelease(16);
+                        robot.mouseRelease(InputEvent.BUTTON1_MASK);
                     }
                     if ("right".equals(attributevalue)) {
-                        robot.mouseRelease(8);
+                        robot.mouseRelease(InputEvent.BUTTON3_MASK);
                     }
-                    if ("center".equals(attributevalue)) {
+                    if ("double".equals(attributevalue)) {
                         robot.mouseRelease(4);
                     }
                 }
@@ -196,5 +197,27 @@ public class ScriptRunner implements Runnable {
             robot.mouseMove(points.get(i).x, points.get(i).y);
             robot.delay(1);//停顿1毫秒
         }
+    }
+
+    /**
+     * 返回到桌面
+     */
+    public void backToDesktop() {
+        robot.keyPress(KeyEvent.VK_WINDOWS);
+        robot.keyPress(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_WINDOWS);
+    }
+
+    /**
+     * 获取指定位置颜色
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    public Color getLocationColor(int x, int y) {
+        // 获取指定位置颜色
+        return robot.getPixelColor(x, y);
     }
 }

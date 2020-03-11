@@ -30,6 +30,10 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
     JLabel lblClickType = new JLabel("点击方式:");
     JComboBox btnClickType = new JComboBox(vector);
 
+    JLabel lblScroll = new JLabel("鼠标滑轮:");
+    JTextField txtScroll = new JTextField("1", 5);
+    JButton btnAddScroll = new JButton("滚动");
+
     JLabel lblDelay = new JLabel("延时(ms):");
     JTextField txtDelay = new JTextField("2000", 5);
     JButton btnDelay = new JButton("添加");
@@ -82,7 +86,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
         contentPanel.add(centerPanel, BorderLayout.CENTER);
         contentPanel.add(southPanel, BorderLayout.SOUTH);
 
-        northPanel.setLayout(new GridLayout(5, 1));
+        northPanel.setLayout(new GridLayout(6, 1));
         JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel1.add(lblX);
         panel1.add(txtX);
@@ -103,6 +107,12 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
         panel2.add(lblClickType);
         panel2.add(btnClickType);
         northPanel.add(panel2);
+
+        JPanel panel9 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel9.add(lblScroll);
+        panel9.add(txtScroll);
+        panel9.add(btnAddScroll);
+        northPanel.add(panel9);
 
         JPanel panel7 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel7.add(lblDelay);
@@ -154,6 +164,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
         btnAddKey.addActionListener(this);
         btnImport.addActionListener(this);
         btnExport.addActionListener(this);
+        btnAddScroll.addActionListener(this);
 
         // 添加按键监听
         btnAddLocation.addKeyListener(new MyListener());// 注意：设置btnLocation为false后，无法响应按键操作，因此，添加下一个按钮的事件
@@ -251,7 +262,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
                 txtScript.append("\"/>\n");
                 txtScript.append("</loop>");
             } catch (Exception e) {
-                txtDelay.setText("延时时间设置错误!");
+                txtImagePath.setText("添加图片错误!");
             }
         }
         if (btnStart.equals(arg0.getSource())) {
@@ -280,6 +291,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
             btnStop.setEnabled(false);
         }
         if (btnClickType.equals(arg0.getSource())) {
+            // 点击类型
             String str = txtScript.getText();
             txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
             txtScript.append("<mousePress id=\"");
@@ -312,20 +324,19 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
                     break;
                 }
                 case 3: {
-                    txtScript.append("center");
+                    txtScript.append("double");
                     txtScript.append("\"/>\n");
                     txtScript.append("<mouseRelease id=\"");
-                    txtScript.append("center");
+                    txtScript.append("double");
                     break;
                 }
-
             }
 
             txtScript.append("\"/>\n");
             txtScript.append("</loop>");
         }
         if (btnDelay.equals(arg0.getSource())) {
-
+            // 延时
             String str = txtDelay.getText();
             try {
                 Long.parseLong(str);
@@ -340,7 +351,21 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
                 txtDelay.setText("延时时间设置错误!");
             }
         }
+        if (btnAddScroll.equals(arg0.getSource())) {
+            // 滚动
+            try {
+                String str = txtScript.getText();
+                txtScript.setText(str.substring(0, str.lastIndexOf("</loop>")));
+                txtScript.append("<mouseWheel value=\"");
+                txtScript.append(txtScroll.getText());
+                txtScript.append("\"/>\n");
+                txtScript.append("</loop>");
+            } catch (Exception e) {
+                txtDelay.setText("延时时间设置错误!");
+            }
+        }
         if (btnAddKey.equals(arg0.getSource())) {
+            // 按下某个键
             String str;
             char c = 0;
             str = txtKey.getText();
@@ -377,6 +402,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
             }
         }
         if (btnImport.equals(arg0.getSource())) {
+            // 导入脚本
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("xml5", "xml");
             chooser.setFileFilter(filter);
@@ -398,6 +424,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
             }
         }
         if (btnExport.equals(arg0.getSource())) {
+            // 导出脚本
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("xml", "xml");
             chooser.setFileFilter(filter);
@@ -414,7 +441,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
             }
         }
         if (btnInputContent.equals(arg0.getSource())) {
-
+            // 输入文本
             String content = txtInputContent.getText();
             if (!content.isEmpty() && content != "") {
                 try {
