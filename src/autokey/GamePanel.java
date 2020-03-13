@@ -26,11 +26,6 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
     JButton btnScreencut = new JButton("截图");
     JButton btnAddImage = new JButton("添加");
 
-    JLabel lblFindColor = new JLabel("找色:");
-    JTextField txtColor = new JTextField(20);
-    JButton btnTakeColor = new JButton("取色");
-    JButton btnAddColor = new JButton("添加");
-
     Vector<String> vector = new Vector<String>();
     JLabel lblClickType = new JLabel("点击方式:");
     JComboBox btnClickType = new JComboBox(vector);
@@ -91,7 +86,7 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
         contentPanel.add(centerPanel, BorderLayout.CENTER);
         contentPanel.add(southPanel, BorderLayout.SOUTH);
 
-        northPanel.setLayout(new GridLayout(7, 1));
+        northPanel.setLayout(new GridLayout(6, 1));
         JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel1.add(lblX);
         panel1.add(txtX);
@@ -107,13 +102,6 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
         panel8.add(btnScreencut);
         panel8.add(btnAddImage);
         northPanel.add(panel8);
-
-        JPanel panel10 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel10.add(lblFindColor);
-        panel10.add(txtColor);
-        panel10.add(btnTakeColor);
-        panel10.add(btnAddColor);
-        northPanel.add(panel10);
 
         JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel2.add(lblClickType);
@@ -167,8 +155,6 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
         btnAddLocation.addActionListener(this);
         btnScreencut.addActionListener(this);
         btnAddImage.addActionListener(this);
-        btnTakeColor.addActionListener(this);
-        btnAddColor.addActionListener(this);
         btnStart.addActionListener(this);
         btnStop.addActionListener(this);
         btnClickType.addActionListener(this);
@@ -182,7 +168,6 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
 
         // 添加按键监听
         btnAddLocation.addKeyListener(new MyListener());// 注意：设置btnLocation为false后，无法响应按键操作，因此，添加下一个按钮的事件
-        btnAddColor.addKeyListener(new MyListener());
         btnStop.addKeyListener(new MyListener());
 
         btnStop.setEnabled(false);
@@ -266,32 +251,6 @@ public class GamePanel extends JPanel implements Runnable, ActionListener {
             } catch (Exception e) {
                 txtDelay.setText(e.getMessage());
             }
-        }
-        if (btnTakeColor.equals(arg0.getSource())) {
-
-            // 取色
-            new CycleThread(new CycleThread.UIUpdate() {
-                @Override
-                public boolean updateUI() {
-                    try {
-                        if(xystate){
-                            btnTakeColor.setEnabled(true);
-                            xystate = false;
-                            return true;
-                        }
-
-                        Point mousepoint = MouseInfo.getPointerInfo().getLocation();
-                        Robot robot = new Robot();
-                        Color c = robot.getPixelColor(mousepoint.x, mousepoint.y);
-                        txtColor.setText(c.getRed() + "," + c.getGreen() + "," + c.getBlue());
-                    } catch (Exception e) {
-                        txtDelay.setText(e.getMessage());
-                    }
-                    return false;
-                }
-            }).start();
-            btnTakeColor.setEnabled(false);
-
         }
         if (btnAddImage.equals(arg0.getSource())) {
 
