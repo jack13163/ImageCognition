@@ -1,5 +1,8 @@
 package autokey;
 
+import imageprocess.Mat2BufImg;
+import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import utis.Bezier;
 
 import javax.swing.*;
@@ -10,13 +13,14 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Vector;
 
 public class RobotUtil {
 
     public Robot robot;
 
-    public RobotUtil(Robot robot){
+    public RobotUtil(Robot robot) {
         this.robot = robot;
     }
 
@@ -233,27 +237,58 @@ public class RobotUtil {
 
     /**
      * 捕捉全屏慕
+     *
      * @return
      */
-    public Icon captureFullScreen() {
+    public BufferedImage captureFullScreen() {
         BufferedImage fullScreenImage = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-        ImageIcon icon = new ImageIcon(fullScreenImage);
-        return icon;
+        return fullScreenImage;
+    }
+
+    /**
+     * 捕捉全屏慕
+     *
+     * @return
+     */
+    public Mat captureFullScreenMat() throws IOException {
+        BufferedImage fullScreen = captureFullScreen();
+        Mat fullscreenMat = Mat2BufImg.BufferedImage2Mat(fullScreen);
+        return fullscreenMat;
     }
 
     /**
      * 捕捉屏幕的一个矫形区域
      *
-     * @param x      x坐标位置
-     * @param y      y坐标位置
-     * @param width  矩形的宽
-     * @param height 矩形的高
+     * @param rect
      * @return
      */
-    public Icon capturePartScreen(int x, int y, int width, int height) {
-        robot.mouseMove(x, y);
-        BufferedImage fullScreenImage = robot.createScreenCapture(new Rectangle(width, height));
-        ImageIcon icon = new ImageIcon(fullScreenImage);
-        return icon;
+    public BufferedImage capturePartScreen(Rect rect) {
+        moveMouseSlowly(rect.x, rect.y);
+        BufferedImage partScreenImage = robot.createScreenCapture(new Rectangle(rect.width, rect.height));
+        return partScreenImage;
+    }
+
+    /**
+     * 捕捉屏幕的一个矫形区域
+     *
+     * @return
+     */
+    public Mat capturePartScreenMat(Rect rect) throws IOException {
+        BufferedImage fullScreen = capturePartScreen(rect);
+        Mat fullscreenMat = Mat2BufImg.BufferedImage2Mat(fullScreen);
+        return fullscreenMat;
+    }
+
+    /**
+     * 点击矩形的中心
+     *
+     * @param rect
+     */
+    public void clickRectCenter(Rect rect) {
+        moveMouseSlowly(rect.x + rect.width / 2, rect.y + rect.height / 2);
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+        robot.delay(10);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        robot.delay(500);
     }
 }

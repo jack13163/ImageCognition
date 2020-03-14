@@ -1,10 +1,14 @@
 package imageprocess;
 
 import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CVHelper {
 
@@ -41,8 +45,12 @@ public class CVHelper {
 
         //从ROI中剪切图片
         Mat imgDesc = new Mat(rect.height, rect.width, image.type());
-        Mat imgROI = new Mat(image, rect);
-        imgROI.copyTo(imgDesc);
+        try {
+            Mat imgROI = new Mat(image, rect);
+            imgROI.copyTo(imgDesc);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         return imgDesc;
     }
 
@@ -233,5 +241,92 @@ public class CVHelper {
         List<Rect> contours = findRects(canny);
         List<Rect> rects = getSmallContours(contours, width_low, height_low, width_up, height_up);
         return rects;
+    }
+
+    /**
+     * @param src
+     * @param tomatch
+     * @param th
+     * @return
+     */
+    public Rect match(Mat src, Mat tomatch, double th) {
+        return match(src, tomatch, Imgproc.TM_SQDIFF_NORMED, th);
+    }
+
+    /**
+     * 模板匹配
+     * <p>
+     * TM_SQDIFF 平方差匹配法：该方法采用平方差来进行匹配；最好的匹配值为0；匹配越差，匹配值越大。
+     * TM_CCORR 相关匹配法：该方法采用乘法操作；数值越大表明匹配程度越好。
+     * TM_CCOEFF 相关系数匹配法：1表示完美的匹配；-1表示最差的匹配。
+     * TM_SQDIFF_NORMED 归一化平方差匹配法。
+     * TM_CCORR_NORMED 归一化相关匹配法。
+     * TM_CCOEFF_NORMED 归一化相关系数匹配法。
+     *
+     * @param src
+     * @param tomatch
+     * @param method
+     * @param th
+     * @return
+     */
+    public Rect match(Mat src, Mat tomatch, int method, double th) {
+
+        int width = src.cols() - tomatch.cols() + 1;
+        int height = src.rows() - tomatch.rows() + 1;
+        // 3 创建32位模板匹配结果Mat
+        Mat result = new Mat(width, height, src.type());
+        // 4 调用 模板匹配函数
+        Imgproc.matchTemplate(src, tomatch, result, method);
+        // 5 归一化
+        Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1, new Mat());
+        // 6 获取模板匹配结果
+        Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
+        // 7 绘制匹配到的结果
+        int x, y;
+        if (method == Imgproc.TM_SQDIFF_NORMED || method == Imgproc.TM_SQDIFF) {
+            x = (int) mmr.minLoc.x;
+            y = (int) mmr.minLoc.y;
+        } else {
+            x = (int) mmr.maxLoc.x;
+            y = (int) mmr.maxLoc.y;
+        }
+
+        // 8 计算图像的相似度
+        Rect rect = new Rect(x, y, tomatch.width(), tomatch.height());
+        Mat tmp = cutImage(src, rect);
+        if (compareHist(tomatch, tmp) >= th) {
+            return rect;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 直方图比较图像的相似度
+     *
+     * @param src_1
+     * @param src_2
+     */
+    public double compareHist(Mat src_1, Mat src_2) {
+        Mat hvs_1 = new Mat();
+        Mat hvs_2 = new Mat();
+        //图片转HSV
+        Imgproc.cvtColor(src_1, hvs_1, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(src_2, hvs_2, Imgproc.COLOR_BGR2HSV);
+
+        Mat hist_1 = new Mat();
+        Mat hist_2 = new Mat();
+
+        //直方图计算
+        Imgproc.calcHist(Stream.of(hvs_1).collect(Collectors.toList()), new MatOfInt(0), new Mat(), hist_1, new MatOfInt(255), new MatOfFloat(0, 256));
+        Imgproc.calcHist(Stream.of(hvs_2).collect(Collectors.toList()), new MatOfInt(0), new Mat(), hist_2, new MatOfInt(255), new MatOfFloat(0, 256));
+
+        //图片归一化
+        Core.normalize(hist_1, hist_1, 1, hist_1.rows(), Core.NORM_MINMAX, -1, new Mat());
+        Core.normalize(hist_2, hist_2, 1, hist_2.rows(), Core.NORM_MINMAX, -1, new Mat());
+
+        //直方图比较
+        double result = Imgproc.compareHist(hist_1, hist_2, Imgproc.CV_COMP_CORREL);
+        return result;
     }
 }

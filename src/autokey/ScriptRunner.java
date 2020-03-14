@@ -105,7 +105,7 @@ public class ScriptRunner implements Runnable {
                         // 屏幕截图
                         FindImage.captureScreen("screen.png", "data/images/");
                         // 找图
-                        java.util.List<CoordBean> results = FindImage.findImage4FullScreen("data/images/screen.png", attributevalue, ImageCognition.SIM_ACCURATE_VERY);
+                        java.util.List<CoordBean> results = FindImage.findImage4FullScreen("data/images/screen.png", attributevalue, ImageCognition.SIM_ACCURATE);
                         if (results != null) {
                             for (int i = 0; i < results.size(); i++) {
                                 // 找到图片中心

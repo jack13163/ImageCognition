@@ -11,6 +11,12 @@
     </properties>
 
     <dependencies>
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.bytedeco/javacv &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.bytedeco</groupId>-->
+<!--            <artifactId>javacv</artifactId>-->
+<!--            <version>1.5.2</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 
