@@ -206,17 +206,16 @@ public class CVHelper {
      * @param src
      * @return
      */
-    public static List<Rect> findRects(Mat src, Rect rect, int width_low, int height_low, int width_up, int height_up) {
-        CVHelper util = new CVHelper();
+    public List<Rect> findRects(Mat src, Rect rect, int width_low, int height_low, int width_up, int height_up) {
 
         // 1.裁剪
-        Mat cut = util.cutImage(src, rect);
+        Mat cut = cutImage(src, rect);
 
         // 2.替换白色背景为黑色
-        Mat change = util.replaceWhiteBackground(cut);
+        Mat change = replaceWhiteBackground(cut);
 
         // 3.灰度化
-        Mat gray = util.grayImg(change);
+        Mat gray = grayImg(change);
 
         // 4.腐蚀
         Mat dst = gray.clone();
@@ -224,15 +223,15 @@ public class CVHelper {
         Imgproc.erode(gray, dst, element, new Point(-1, -1), 3);
 
         // 5.二值化
-        Mat black = util.threshold(dst);
+        Mat black = threshold(dst);
 
         // 6.边缘处理
         Mat canny = black.clone();
         Imgproc.Canny(black, canny, 100, 200);
 
         // 7.查找矩形轮廓
-        List<Rect> contours = util.findRects(canny);
-        List<Rect> rects = util.getSmallContours(contours, width_low, height_low, width_up, height_up);
+        List<Rect> contours = findRects(canny);
+        List<Rect> rects = getSmallContours(contours, width_low, height_low, width_up, height_up);
         return rects;
     }
 }
