@@ -31,6 +31,22 @@ public class CVHelper {
     }
 
     /**
+     * 图片裁剪
+     *
+     * @param image
+     * @param rect
+     * @return
+     */
+    public Mat cutImage(Mat image, Rect rect) {
+
+        //从ROI中剪切图片
+        Mat imgDesc = new Mat(rect.height, rect.width, image.type());
+        Mat imgROI = new Mat(image, rect);
+        imgROI.copyTo(imgDesc);
+        return imgDesc;
+    }
+
+    /**
      * 查找矩形轮廓
      *
      * @param image
@@ -50,6 +66,35 @@ public class CVHelper {
         }
 
         return result;
+    }
+
+    /**
+     * 绘制矩形轮廓
+     *
+     * @param image
+     * @return
+     */
+    public void drawRects(Mat image, List<Rect> rects) {
+        drawRects(image, rects, 0, 0);
+    }
+
+    /**
+     * 绘制矩形轮廓
+     *
+     * @param image
+     * @return
+     */
+    public void drawRects(Mat image, List<Rect> rects, int off_x, int off_y) {
+
+        for (int i = 0, len = rects.size(); i < len; i++) {
+            Rect rect = rects.get(i);
+            if (off_x != 0 || off_y != 0) {
+                Rect newRect = new Rect(rect.x + off_x, rect.y + off_y, rect.width, rect.height);
+                Imgproc.rectangle(image, newRect, new Scalar(0, 0, 255));
+            } else {
+                Imgproc.rectangle(image, rect, new Scalar(0, 0, 255));
+            }
+        }
     }
 
     /**
@@ -153,5 +198,41 @@ public class CVHelper {
 
     public int max(double d1, double d2, double d3, double d4) {
         return (int) Math.max(Math.max(d1, d2), Math.max(d3, d4));
+    }
+
+    /**
+     * 查找图片某一区域中的矩形
+     *
+     * @param src
+     * @return
+     */
+    public static List<Rect> findRects(Mat src, Rect rect, int width_low, int height_low, int width_up, int height_up) {
+        CVHelper util = new CVHelper();
+
+        // 1.裁剪
+        Mat cut = util.cutImage(src, rect);
+
+        // 2.替换白色背景为黑色
+        Mat change = util.replaceWhiteBackground(cut);
+
+        // 3.灰度化
+        Mat gray = util.grayImg(change);
+
+        // 4.腐蚀
+        Mat dst = gray.clone();
+        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(4, 4));
+        Imgproc.erode(gray, dst, element, new Point(-1, -1), 3);
+
+        // 5.二值化
+        Mat black = util.threshold(dst);
+
+        // 6.边缘处理
+        Mat canny = black.clone();
+        Imgproc.Canny(black, canny, 100, 200);
+
+        // 7.查找矩形轮廓
+        List<Rect> contours = util.findRects(canny);
+        List<Rect> rects = util.getSmallContours(contours, width_low, height_low, width_up, height_up);
+        return rects;
     }
 }
