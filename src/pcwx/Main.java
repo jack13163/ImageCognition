@@ -3,6 +3,7 @@ package pcwx;
 import autokey.RobotUtil;
 import imageprocess.CVHelper;
 import org.opencv.core.*;
+import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import javax.swing.*;
@@ -19,6 +20,7 @@ public class Main {
 
     private static Mat fullscreenMat;
     private static boolean isRun = true;
+    private static boolean debug = false;
 
     public static void main(String[] args) {
 
@@ -35,7 +37,7 @@ public class Main {
                     try {
                         while (isRun){
                             fullscreenMat = robotUtil.captureFullScreenMat();
-                            Thread.sleep(300);
+                            Thread.sleep(500);
                         }
                     }catch (Exception ex){
                         ex.printStackTrace();
@@ -70,6 +72,13 @@ public class Main {
                 return;
             }
 
+            // 调试识别微信区域
+            if(debug) {
+                Mat mat = cvHelper.cutImage(fullscreenMat, wxRect);
+                HighGui.imshow("矩形检测", mat);
+                HighGui.waitKey(0);
+            }
+
             // 点击联系人
             Rect message = new Rect(wxRect.x + 15, wxRect.y + 94, 30, 30);
             Rect people = new Rect(wxRect.x + 15, wxRect.y + 130, 30, 30);
@@ -101,16 +110,18 @@ public class Main {
     public static Rect findWxForm(Mat fullscreenMat) throws Exception {
 
         Mat newgroupImage = Imgcodecs.imread("data/images/pcwx_newgroup.png");
-        Mat sendmessageImage = Imgcodecs.imread("data/images/pcwx_sendmessage.png");
+        Mat leftBottomImage = Imgcodecs.imread("data/images/pcwx_leftbottom.png");
+        Mat close = Imgcodecs.imread("data/images/pcwx_close.png");
 
         Rect rect1 = cvHelper.match(fullscreenMat, newgroupImage, 0.95);
-        Rect rect2 = cvHelper.match(fullscreenMat, sendmessageImage, 0.95);
+        Rect rect2 = cvHelper.match(fullscreenMat, leftBottomImage, 0.95);
+        Rect rect3 = cvHelper.match(fullscreenMat, close, 0.95);
 
-        if (rect1 != null && rect2 != null) {
+        if (rect1 != null && rect2 != null && rect3 != null) {
             int x = rect1.x - 270;
             int y = rect1.y - 22;
-            int width = (rect2.x - x) + rect2.width + 26;
-            int height = (rect2.y - y) + rect2.height + 8;
+            int width = (rect3.x - x) + rect3.width + 10;
+            int height = (rect2.y - y) + rect2.height + 14;
             return new Rect(x, y, width, height);
         } else {
             return null;
