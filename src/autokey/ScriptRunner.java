@@ -112,7 +112,7 @@ public class ScriptRunner implements Runnable {
                                 CoordBean loc = results.get(i);
                                 int end_x = loc.getX() + loc.getWidth() / 2;
                                 int end_y = loc.getY() + loc.getHeight() / 2;
-                                robotUtil.moveMouseSlowly(end_x, end_y);
+                                robotUtil.moveMouseSlowly(end_x, end_y, 1);
                                 robot.delay(1000);// 延时1秒
                             }
                         } else {
@@ -128,7 +128,7 @@ public class ScriptRunner implements Runnable {
                     int end_x = Integer.parseInt(loopattributes.item(0).getNodeValue());
                     int end_y = Integer.parseInt(loopattributes.item(1).getNodeValue());
 
-                    robotUtil.moveMouseSlowly(end_x, end_y);
+                    robotUtil.moveMouseSlowly(end_x, end_y, 0);
                 }
                 if ("mousePress".equals(nodename) || "press".equals(nodename)) {
                     if ("left".equals(attributevalue)) {

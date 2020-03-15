@@ -37,7 +37,7 @@ public class Main {
                     try {
                         while (isRun){
                             fullscreenMat = robotUtil.captureFullScreenMat();
-                            Thread.sleep(500);
+                            Thread.sleep(300);
                         }
                     }catch (Exception ex){
                         ex.printStackTrace();
@@ -48,7 +48,6 @@ public class Main {
 
             // 点击微信logo
             Mat logo = Imgcodecs.imread("data/images/pcwx_logo.png");
-
             tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
             while (tempRect1 == null) {
                 tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
@@ -65,7 +64,7 @@ public class Main {
             Thread.sleep(1000);
 
             // 识别微信区域
-            Rect wxRect = findWxForm(fullscreenMat);
+            Rect wxRect = findWxForm();
             if (wxRect == null) {
                 // 最大化微信
                 JOptionPane.showMessageDialog(null, "无法找到微信窗口", "提示", JOptionPane.WARNING_MESSAGE);
@@ -82,17 +81,30 @@ public class Main {
             // 点击联系人
             Rect message = new Rect(wxRect.x + 15, wxRect.y + 94, 30, 30);
             Rect people = new Rect(wxRect.x + 15, wxRect.y + 130, 30, 30);
-            Rect empty = new Rect(wxRect.x + 345, wxRect.y + 35, 30, 30);
-            robotUtil.clickRectCenter(message);
+            Rect empty = new Rect(wxRect.x, wxRect.y + 500, 60, 30);
+            Rect first = new Rect(wxRect.x + 60, wxRect.y + 100, 250, 60);
+            Rect listtop = new Rect(wxRect.x + 306, wxRect.y + 70, 4, 4);
             robotUtil.clickRectCenter(people);
+
+            // 翻到最前
+            for (int i = 0; i < 10; i++) {
+                robotUtil.clickRectCenter(listtop);
+            }
+            robot.mouseWheel(-3);
+            robotUtil.clickRectCenter(first);
             robotUtil.clickRectCenter(empty);
 
             // 查找下一个需要发送消息的联系人
-            Rect node = findNextNode(fullscreenMat, wxRect);
+            Rect node = findNextNode(wxRect);
             while (node != null) {
-                robotUtil.clickRectCenter(node);
+                while (node != null) {
+                    robotUtil.clickRectCenter(node);
+                    node = findNextNode(wxRect);
+                }
+                robot.mouseWheel(3);
+                robotUtil.clickRectCenter(empty);
                 Thread.sleep(1000);
-                node = findNextNode(fullscreenMat, wxRect);
+                node = findNextNode(wxRect);
             }
 
             // 结束任务
@@ -107,7 +119,7 @@ public class Main {
      *
      * @throws Exception
      */
-    public static Rect findWxForm(Mat fullscreenMat) throws Exception {
+    public static Rect findWxForm() throws Exception {
 
         Mat newgroupImage = Imgcodecs.imread("data/images/pcwx_newgroup.png");
         Mat leftBottomImage = Imgcodecs.imread("data/images/pcwx_leftbottom.png");
@@ -133,7 +145,7 @@ public class Main {
      *
      * @throws Exception
      */
-    public static Rect findNextNode(Mat fullscreenMat, Rect wxRect) throws Exception {
+    public static Rect findNextNode(Rect wxRect) throws Exception {
 
         CVHelper util = new CVHelper();
 

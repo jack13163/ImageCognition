@@ -26,11 +26,14 @@ public class RobotUtil {
 
     /**
      * 缓慢移动鼠标
+     * type:
+     * 0-直线
+     * 1-贝塞尔曲线
      *
      * @param end_x
      * @param end_y
      */
-    public void moveMouseSlowly(int end_x, int end_y) {
+    public void moveMouseSlowly(int end_x, int end_y, int type) {
 
         // 获取鼠标当前位置
         Point p = MouseInfo.getPointerInfo().getLocation();
@@ -38,10 +41,18 @@ public class RobotUtil {
         int start_y = p.y;
 
         int step = 500;
-        Vector<Point> points = Bezier.generatePoints(p,
-                new Point((start_x + end_x) * 2 / 3, (start_y + end_y) / 3),
-                new Point(end_x, end_y),
-                500);
+        Vector<Point> points = null;
+        if (type == 0) {
+            points = Bezier.generatePoints(p,
+                    new Point((start_x + end_x) / 2, (start_y + end_y) / 2),
+                    new Point(end_x, end_y),
+                    step);
+        } else {
+            points = Bezier.generatePoints(p,
+                    new Point((start_x + end_x) * 2 / 3, (start_y + end_y) / 3),
+                    new Point(end_x, end_y),
+                    step);
+        }
         for (int i = 0; i < step; i++) {
             robot.mouseMove(points.get(i).x, points.get(i).y);
             robot.delay(1);//停顿1毫秒
@@ -160,7 +171,7 @@ public class RobotUtil {
      * @param delay 该操作后的延迟时间
      */
     public void clickLMouse(int x, int y, int delay) {
-        moveMouseSlowly(x, y);
+        moveMouseSlowly(x, y, 0);
         robot.mousePress(InputEvent.BUTTON1_MASK);
         robot.delay(10);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
@@ -173,9 +184,10 @@ public class RobotUtil {
      * @param x     x坐标位置
      * @param y     y坐标位置
      * @param delay 该操作后的延迟时间
+     * @param type  轨迹类型
      */
-    public void doubleClickLMouse(int x, int y, int delay) {
-        moveMouseSlowly(x, y);
+    public void doubleClickLMouse(int x, int y, int delay, int type) {
+        moveMouseSlowly(x, y, type);
         robot.mousePress(InputEvent.BUTTON1_MASK);
         robot.delay(10);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
@@ -192,9 +204,10 @@ public class RobotUtil {
      * @param x     x坐标位置
      * @param y     y坐标位置
      * @param delay 该操作后的延迟时间
+     * @param type  轨迹类型
      */
-    public void clickRMouse(int x, int y, int delay) {
-        moveMouseSlowly(x, y);
+    public void clickRMouse(int x, int y, int delay, int type) {
+        moveMouseSlowly(x, y, type);
         robot.mousePress(InputEvent.BUTTON3_MASK);
         robot.delay(10);
         robot.mouseRelease(InputEvent.BUTTON3_MASK);
@@ -263,7 +276,7 @@ public class RobotUtil {
      * @return
      */
     public BufferedImage capturePartScreen(Rect rect) {
-        moveMouseSlowly(rect.x, rect.y);
+        moveMouseSlowly(rect.x, rect.y, 0);
         BufferedImage partScreenImage = robot.createScreenCapture(new Rectangle(rect.width, rect.height));
         return partScreenImage;
     }
@@ -285,10 +298,27 @@ public class RobotUtil {
      * @param rect
      */
     public void clickRectCenter(Rect rect) {
-        moveMouseSlowly(rect.x + rect.width / 2, rect.y + rect.height / 2);
+        moveMouseSlowly(rect.x + rect.width / 2, rect.y + rect.height / 2, 0);
         robot.mousePress(InputEvent.BUTTON1_MASK);
         robot.delay(10);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
-        robot.delay(500);
+        robot.delay(100);
+    }
+
+    /**
+     * 鼠标拖动
+     * @param start_x
+     * @param start_y
+     * @param end_x
+     * @param end_y
+     */
+    public void mouseDrag(int start_x, int start_y, int end_x, int end_y) {
+
+        moveMouseSlowly(start_x, start_y, 0);
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+        robot.delay(10);
+        moveMouseSlowly(end_x, end_y, 0);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        robot.delay(10);
     }
 }

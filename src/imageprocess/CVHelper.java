@@ -214,6 +214,17 @@ public class CVHelper {
      * @param src
      * @return
      */
+    public List<Rect> findRects(Mat src, int width_low, int height_low, int width_up, int height_up) {
+        Rect rect = new Rect(0, 0, src.width(), src.height());
+        return findRects(src, rect, width_low, height_low, width_up, height_up);
+    }
+
+    /**
+     * 查找图片某一区域中的矩形
+     *
+     * @param src
+     * @return
+     */
     public List<Rect> findRects(Mat src, Rect rect, int width_low, int height_low, int width_up, int height_up) {
 
         // 1.裁剪
