@@ -61,7 +61,8 @@ public class Main {
             if (wxRect == null) {
                 // 最大化微信
                 maxWxForm();
-                wxRect = findWxForm();
+                Dimension tk = Toolkit.getDefaultToolkit().getScreenSize();
+                wxRect = new Rect(0, 0, tk.width, tk.height);
             }else {
                 // 调试识别微信区域
                 if (debug) {
@@ -113,8 +114,8 @@ public class Main {
      */
     public static void doJob() throws IOException, URISyntaxException {
         // 文字识别
-        BufferedImage image = Mat2BufImg.Mat2BufImg(fullscreenMat, "png");
-        String result = BDOCR.checkFile(image);
+        BufferedImage image = Mat2BufImg.toBufferedImage(fullscreenMat);
+        String result = BDOCR.checkFile(image, "jpg");
         OCRResult jsonObject = JSON.parseObject(result, OCRResult.class);
         jsonObject.getWords_result().stream().forEach(str -> {
             System.out.println(str.getWords());
@@ -133,7 +134,10 @@ public class Main {
      */
     public static void maxWxForm(){
         Mat newgroupImage = Imgcodecs.imread("data/images/pcwx_newgroup.png");
-        Rect rect = cvHelper.match(fullscreenMat, newgroupImage, 0.95);
+        Rect rect = cvHelper.match(fullscreenMat, newgroupImage, 0.96);
+        while(rect == null){
+            rect = cvHelper.match(fullscreenMat, newgroupImage, 0.96);
+        }
         robotUtil.doubleClickLMouse(rect.x + 50, rect.y, 500, 0);
     }
 

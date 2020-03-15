@@ -12,11 +12,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 /**
  * 图像文字识别
@@ -28,25 +30,32 @@ public class BDOCR {
     /**
      * 识别本地图片的文字
      */
-    public static String checkFile(String path) throws URISyntaxException, IOException {
+    public static String checkFile(String path, String format) throws URISyntaxException, IOException {
         File file = new File(path);
         if (!file.exists()) {
             throw new NullPointerException("图片不存在");
         }
-        String image = BaseImg64.encodeImgageToBase64(file);
-        String param = "image=" + image;
+        String image = BaseImg64.encodeImgageToBase64(file, format);
+        System.out.println(image);
+        // 去掉开头的格式化符号
+        String pure_image = image.substring(image.indexOf(",") + 1);
+        // 将url 或者字符传进行转码，保证传输的时候不出现乱码；最常用的方式是URLEncode与URLDecode
+        String param = "image=" + URLEncoder.encode(pure_image, "UTF-8");
         return post(param);
     }
 
     /**
      * 识别内存图片的文字
      */
-    public static String checkFile(BufferedImage bufferedImage) throws URISyntaxException, IOException {
+    public static String checkFile(BufferedImage bufferedImage, String format) throws URISyntaxException, IOException {
         if (bufferedImage == null) {
             throw new NullPointerException("图片不存在");
         }
-        String image = BaseImg64.encodeImgageToBase64(bufferedImage);
-        String param = "image=" + image;
+        String image = BaseImg64.encodeImgageToBase64(bufferedImage, format);
+        System.out.println(image);
+        String pure_image = image.substring(image.indexOf(",") + 1);
+        // 将url 或者字符传进行转码，保证传输的时候不出现乱码；最常用的方式是URLEncode与URLDecode
+        String param = "image=" + URLEncoder.encode(pure_image, "UTF-8");
         return post(param);
     }
 
@@ -90,10 +99,14 @@ public class BDOCR {
 
     public static void main(String[] args) {
         String path = "data/tmp/test.png";
+        File file = new File(path);
         try {
+            BufferedImage image = ImageIO.read(file);
             long now = System.currentTimeMillis();
-            String result = checkFile(path);
+            String result = checkFile(image, "png");
             System.out.println("耗时：" + (System.currentTimeMillis() - now) / 1000 + "s");
+            System.out.println(result);
+
             OCRResult jsonObject = JSON.parseObject(result, OCRResult.class);
             jsonObject.getWords_result().stream().forEach(str -> {
                 System.out.println(str.getWords());

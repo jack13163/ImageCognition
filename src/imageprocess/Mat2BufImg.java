@@ -7,6 +7,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,24 +19,20 @@ public class Mat2BufImg {
      * Mat转换成BufferedImage
      *
      * @param matrix        要转换的Mat
-     * @param fileExtension 格式为 ".jpg", ".png", etc
      * @return
      */
-    public static BufferedImage Mat2BufImg(Mat matrix, String fileExtension) {
-        // convert the matrix into a matrix of bytes appropriate for
-        // this file extension
-        MatOfByte mob = new MatOfByte();
-        Imgcodecs.imencode(fileExtension, matrix, mob);
-        // convert the "matrix of bytes" into a byte array
-        byte[] byteArray = mob.toArray();
-        BufferedImage bufImage = null;
-        try {
-            InputStream in = new ByteArrayInputStream(byteArray);
-            bufImage = ImageIO.read(in);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static BufferedImage toBufferedImage(Mat matrix) {
+        int type = BufferedImage.TYPE_BYTE_GRAY;
+        if (matrix.channels() > 1) {
+            type = BufferedImage.TYPE_3BYTE_BGR;
         }
-        return bufImage;
+        int bufferSize = matrix.channels() * matrix.cols() * matrix.rows();
+        byte[] buffer = new byte[bufferSize];
+        matrix.get(0, 0, buffer); // get all pixel from martix
+        BufferedImage image = new BufferedImage(matrix.cols(), matrix.rows(), type);
+        final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        System.arraycopy(buffer, 0, targetPixels, 0, buffer.length);
+        return image;
     }
 
     /**

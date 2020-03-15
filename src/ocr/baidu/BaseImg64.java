@@ -23,12 +23,12 @@ public class BaseImg64 {
      * @param imageUrl 图片的url路径，如http://.....xx.jpg
      * @return
      */
-    public static String encodeImgageToBase64(URL imageUrl) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+    public static String encodeImgageToBase64(URL imageUrl, String format) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
         ByteArrayOutputStream outputStream = null;
         try {
             BufferedImage bufferedImage = ImageIO.read(imageUrl);
             outputStream = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "jpg", outputStream);
+            ImageIO.write(bufferedImage, format, outputStream);
         } catch (MalformedURLException e1) {
             e1.printStackTrace();
         } catch (IOException e) {
@@ -36,7 +36,10 @@ public class BaseImg64 {
         }
         // 对字节数组Base64编码
         BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
+        String base64 = encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
+        base64 = base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
+        String image_base64 = "data:image/" + format + ";base64,"+ base64;
+        return image_base64;
     }
 
     /**
@@ -45,12 +48,12 @@ public class BaseImg64 {
      * @param imageFile 本地图片的url路径
      * @return
      */
-    public static String encodeImgageToBase64(File imageFile) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+    public static String encodeImgageToBase64(File imageFile, String format) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
         ByteArrayOutputStream outputStream = null;
         try {
             BufferedImage bufferedImage = ImageIO.read(imageFile);
             outputStream = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "jpg", outputStream);
+            ImageIO.write(bufferedImage, format, outputStream);
         } catch (MalformedURLException e1) {
             e1.printStackTrace();
         } catch (IOException e) {
@@ -58,7 +61,10 @@ public class BaseImg64 {
         }
         // 对字节数组Base64编码
         BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
+        String base64 = encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
+        base64 = base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
+        String image_base64 = "data:image/" + format + ";base64,"+ base64;
+        return image_base64;
     }
 
     /**
@@ -67,11 +73,11 @@ public class BaseImg64 {
      * @param bufferedImage 内存图片
      * @return
      */
-    public static String encodeImgageToBase64(BufferedImage bufferedImage) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+    public static String encodeImgageToBase64(BufferedImage bufferedImage, String format) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
         ByteArrayOutputStream outputStream = null;
         try {
             outputStream = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "png", outputStream);
+            ImageIO.write(bufferedImage, format, outputStream);
         } catch (MalformedURLException e1) {
             e1.printStackTrace();
         } catch (IOException e) {
@@ -79,7 +85,10 @@ public class BaseImg64 {
         }
         // 对字节数组Base64编码
         BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
+        String base64 = encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
+        base64 = base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
+        String image_base64 = "data:image/" + format + ";base64,"+ base64;
+        return image_base64;
     }
 
     /**
@@ -91,8 +100,7 @@ public class BaseImg64 {
     public static void decodeBase64ToImage(String base64, String path, String imgName) {
         BASE64Decoder decoder = new BASE64Decoder();
         try {
-            FileOutputStream write = new FileOutputStream(new File(path
-                    + imgName));
+            FileOutputStream write = new FileOutputStream(new File(path + imgName));
             byte[] decoderBytes = decoder.decodeBuffer(base64);
             write.write(decoderBytes);
             write.close();
