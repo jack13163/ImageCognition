@@ -1,13 +1,19 @@
 package pcwx;
 
 import autokey.RobotUtil;
+import com.alibaba.fastjson.JSON;
 import imageprocess.CVHelper;
+import imageprocess.Mat2BufImg;
+import ocr.baidu.BDOCR;
+import ocr.baidu.bean.OCRResult;
 import org.opencv.core.*;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 
-import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,7 +26,7 @@ public class Main {
 
     private static Mat fullscreenMat;
     private static boolean isRun = true;
-    private static boolean debug = false;
+    private static boolean debug = true;
 
     public static void main(String[] args) {
 
@@ -48,20 +54,21 @@ public class Main {
 
             // 点击微信logo
             clickWxlogo();
-            Thread.sleep(1000);
+            Thread.sleep(500);
 
             // 识别微信区域
             Rect wxRect = findWxForm();
             if (wxRect == null) {
                 // 最大化微信
                 maxWxForm();
-            }
-
-            // 调试识别微信区域
-            if (debug) {
-                Mat mat = cvHelper.cutImage(fullscreenMat, wxRect);
-                HighGui.imshow("矩形检测", mat);
-                HighGui.waitKey(0);
+                wxRect = findWxForm();
+            }else {
+                // 调试识别微信区域
+                if (debug) {
+                    Mat mat = cvHelper.cutImage(fullscreenMat, wxRect);
+                    HighGui.imshow("矩形检测", mat);
+                    HighGui.waitKey(0);
+                }
             }
 
             // 点击联系人
@@ -104,15 +111,14 @@ public class Main {
     /**
      * 执行其他操作
      */
-    public static void doJob() {
-        // 个人资料
-        Mat info = Imgcodecs.imread("data/images/pcwx_personinfo.png");
-        Rect rect = cvHelper.match(fullscreenMat, info, 0.95);
-        if (rect != null) {
-            robotUtil.clickRectCenter(rect);
-        } else {
-            System.out.println("群");
-        }
+    public static void doJob() throws IOException, URISyntaxException {
+        // 文字识别
+        BufferedImage image = Mat2BufImg.Mat2BufImg(fullscreenMat, "png");
+        String result = BDOCR.checkFile(image);
+        OCRResult jsonObject = JSON.parseObject(result, OCRResult.class);
+        jsonObject.getWords_result().stream().forEach(str -> {
+            System.out.println(str.getWords());
+        });
     }
 
     /**
@@ -126,7 +132,9 @@ public class Main {
      * 最大化微信
      */
     public static void maxWxForm(){
-        clickImage("data/images/wx_max.png");
+        Mat newgroupImage = Imgcodecs.imread("data/images/pcwx_newgroup.png");
+        Rect rect = cvHelper.match(fullscreenMat, newgroupImage, 0.95);
+        robotUtil.doubleClickLMouse(rect.x + 50, rect.y, 500, 0);
     }
 
     /**
@@ -135,9 +143,9 @@ public class Main {
      */
     public static void clickImage(String imagepath) {
         Mat logo = Imgcodecs.imread(imagepath);
-        Rect tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
+        Rect tempRect1 = cvHelper.match(fullscreenMat, logo, 0.99);
         while (tempRect1 == null) {
-            tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
+            tempRect1 = cvHelper.match(fullscreenMat, logo, 0.99);
         }
         robotUtil.clickRectCenter(tempRect1);
     }

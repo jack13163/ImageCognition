@@ -22,7 +22,7 @@ import java.net.URISyntaxException;
  * 图像文字识别
  */
 
-public class Check {
+public class BDOCR {
     private static final String POST_URL = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + AuthService.getAuth();
 
     /**
