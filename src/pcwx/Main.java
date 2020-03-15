@@ -35,11 +35,11 @@ public class Main {
                 @Override
                 public void run() {
                     try {
-                        while (isRun){
+                        while (isRun) {
                             fullscreenMat = robotUtil.captureFullScreenMat();
                             Thread.sleep(300);
                         }
-                    }catch (Exception ex){
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
@@ -47,39 +47,24 @@ public class Main {
             Thread.sleep(3000);
 
             // 点击微信logo
-            Mat logo = Imgcodecs.imread("data/images/pcwx_logo.png");
-            tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
-            while (tempRect1 == null) {
-                tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
-            }
-            robotUtil.clickRectCenter(tempRect1);
-            Thread.sleep(1000);
-
-            // 点击消息界面
-            Mat sendmessage = Imgcodecs.imread("data/images/pcwx_message1.png");
-            tempRect1 = cvHelper.match(fullscreenMat, sendmessage, 0.8);
-            if (tempRect1 != null) {
-                robotUtil.clickRectCenter(tempRect1);
-            }
+            clickWxlogo();
             Thread.sleep(1000);
 
             // 识别微信区域
             Rect wxRect = findWxForm();
             if (wxRect == null) {
                 // 最大化微信
-                JOptionPane.showMessageDialog(null, "无法找到微信窗口", "提示", JOptionPane.WARNING_MESSAGE);
-                return;
+                maxWxForm();
             }
 
             // 调试识别微信区域
-            if(debug) {
+            if (debug) {
                 Mat mat = cvHelper.cutImage(fullscreenMat, wxRect);
                 HighGui.imshow("矩形检测", mat);
                 HighGui.waitKey(0);
             }
 
             // 点击联系人
-            Rect message = new Rect(wxRect.x + 15, wxRect.y + 94, 30, 30);
             Rect people = new Rect(wxRect.x + 15, wxRect.y + 130, 30, 30);
             Rect empty = new Rect(wxRect.x, wxRect.y + 500, 60, 30);
             Rect first = new Rect(wxRect.x + 60, wxRect.y + 100, 250, 60);
@@ -99,8 +84,10 @@ public class Main {
             while (node != null) {
                 while (node != null) {
                     robotUtil.clickRectCenter(node);
+                    doJob();
                     node = findNextNode(wxRect);
                 }
+
                 robot.mouseWheel(3);
                 robotUtil.clickRectCenter(empty);
                 Thread.sleep(1000);
@@ -112,6 +99,47 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 执行其他操作
+     */
+    public static void doJob() {
+        // 个人资料
+        Mat info = Imgcodecs.imread("data/images/pcwx_personinfo.png");
+        Rect rect = cvHelper.match(fullscreenMat, info, 0.95);
+        if (rect != null) {
+            robotUtil.clickRectCenter(rect);
+        } else {
+            System.out.println("群");
+        }
+    }
+
+    /**
+     * 点击微信logo
+     */
+    public static void clickWxlogo() {
+        clickImage("data/images/pcwx_logo.png");
+    }
+
+    /**
+     * 最大化微信
+     */
+    public static void maxWxForm(){
+        clickImage("data/images/wx_max.png");
+    }
+
+    /**
+     * 点击图片
+     * @param imagepath
+     */
+    public static void clickImage(String imagepath) {
+        Mat logo = Imgcodecs.imread(imagepath);
+        Rect tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
+        while (tempRect1 == null) {
+            tempRect1 = cvHelper.match(fullscreenMat, logo, 0.95);
+        }
+        robotUtil.clickRectCenter(tempRect1);
     }
 
     /**

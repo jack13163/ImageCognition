@@ -12,6 +12,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -32,7 +33,19 @@ public class Check {
         if (!file.exists()) {
             throw new NullPointerException("图片不存在");
         }
-        String image = BaseImg64.getImageStrFromPath(path);
+        String image = BaseImg64.encodeImgageToBase64(file);
+        String param = "image=" + image;
+        return post(param);
+    }
+
+    /**
+     * 识别内存图片的文字
+     */
+    public static String checkFile(BufferedImage bufferedImage) throws URISyntaxException, IOException {
+        if (bufferedImage == null) {
+            throw new NullPointerException("图片不存在");
+        }
+        String image = BaseImg64.encodeImgageToBase64(bufferedImage);
         String param = "image=" + image;
         return post(param);
     }
